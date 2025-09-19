@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Email Helper Dashboard</title>
+  <link href="dist/output.css" rel="stylesheet" />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      font-family: sans-serif;
+    }
+
+    #dashboard {
+      display: none;
+    }
+
+    #messageArea {
+      margin-top: 20px;
+      white-space: pre-wrap;
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 8px;
+      background: #f9f9f9;
+    }
+  </style>
+</head>
+<body class="h-screen w-screen overflow-hidden">
+
+  <div id="loginPage">
+    <button id="loginBtn">Log In</button>
+    <input id="resumeUpload" type="file" accept=".pdf,.doc,.docx" />
+    <input type="email" id="userEmail" placeholder="Enter your email" />
+  </div>
+
+  <div class="flex h-full w-full">
+    <!-- Left Sidebar -->
+    <div id="msgSection" class="w-1/4 h-full border-r border-gray-300 overflow-y-auto flex flex-col divide-y divide-gray-200">
+      <div id="newMsg" class="flex-1 overflow-auto bg-red-100 p-2">
+        <p>Here is the newMsg</p>
+      
+        
+        
+      </div>
+
+      <div id="sentMsg" class="flex-1 overflow-auto bg-blue-100 p-2">
+        <p>Here is the sentMsg</p>
+      </div>
+    </div>
+
+    <!-- Right Panel (placeholder) -->
+    <div id="emailView" class="flex-1 h-full overflow-auto p-4 bg-white">
+      <p>This is the right panel (optional).</p>
+      <div id="subject:"></div>
+      <div id="to:"></div>
+      <div id="messageArea"></div>
+      <button id="sendBtn">Send Email</button>
+    </div>
+  </div>
+
+  <script src="window.js" defer></script>
+</body>
+</html>

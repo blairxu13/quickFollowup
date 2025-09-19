@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <style>
+        body {
+            margin: 0;
+            background: transparent;
+            overflow: hidden;
+        }
+
+        #stage {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            -webkit-app-region: drag;
+            /* window draggable by default */
+        }
+
+        .pet-wrap {
+            position: absolute;
+            left: 40px;
+            top: 40px;
+            /* where your pet lives */
+            -webkit-app-region: drag;
+            /* still draggable */
+        }
+
+        #pet {
+            display: block;
+            /* kill inline-gap */
+            width: 160px;
+            height: 160px;
+        }
+
+        #bubble {
+            position: absolute;
+            left: calc(100% + 8px);
+            /* sit to the RIGHT of pet */
+            top: 12px;
+            /* adjust vertically as you like */
+            padding: 6px 10px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, .8);
+            color: #fff;
+            font: 14px/1.3 system-ui;
+            pointer-events: none;
+            z-index: 10;
+            -webkit-app-region: no-drag;
+            /* bubble itself not draggable */
+            max-width: 40ch;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="stage">
+        <div class="pet-wrap">
+            <img id="pet" src="./assets/pet.png" alt="pet" />
+            <div id="bubble"></div>
+        </div>
+    </div>
+
+
+    <script src="./pet.js"></script>
+</body>
+
+</html>

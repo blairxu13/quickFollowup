@@ -1,0 +1,28 @@
+{
+    "manifest_version": 3,
+  "name": "Jobs Helper",
+  "version": "2.0",
+  "permissions": ["windows", "storage", "tabs", "activeTab", "scripting", "identity"],
+  "description": "Chrome extension for job seekers.",
+   "action": {
+    
+    "default_title": "Open Floating Window"
+   },
+   "host_permissions": ["<all_urls>"],
+   "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": [ "popup/content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "oauth2": {
+    "client_id": "241773384310-30sk1uhsnf70quvkbfg3rp077l9oag9o.apps.googleusercontent.com",
+    "scopes": [
+      "https://www.googleapis.com/auth/gmail.send"
+    ]
+  },
+   "background": {
+    "service_worker": "popup/background.js"
+  }
+}
