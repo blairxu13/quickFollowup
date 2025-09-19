@@ -1,2 +1,20 @@
+# deps everywhere
 node_modules/
 **/node_modules/
+
+# Python venvs
+venv/
+**/venv/
+backend/venv/
+
+# Python build cache
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+
+# Electron big builds
+extensions/**/electron/dist/
+
+# mac junk
+.DS_Store
