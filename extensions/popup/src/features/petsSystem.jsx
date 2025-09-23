@@ -35,6 +35,7 @@ export default function Petsystem() {
   }
 
 
+
   async function adoptPet(pet) {
     if (!userId) return;
     console.log("pet", pet)
@@ -54,8 +55,10 @@ export default function Petsystem() {
       console.error("adopt failed", await res.text());
       return;
     }
-
-    // success → hide adoption grid, show store
+    //launch the app
+    const link = `quickfollowup://?user_id=${encodeURIComponent(userId)}`;
+    window.location.href = link;
+    
     setPetInfo([]);
     setExpandedId(null);
     setStoreInfo(["food1", "food2"]);

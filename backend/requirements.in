@@ -1,0 +1,10 @@
+fastapi~=0.95
+uvicorn[standard]~=0.22
+python-multipart~=0.0
+python-dotenv~=1.0
+supabase~=2.4
+pymupdf~=1.22
+pydantic<2
+langchain==0.2.12
+langchain-openai==0.1.7
+

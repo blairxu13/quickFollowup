@@ -156,6 +156,10 @@ async def get_unsent_emails(user_id: str):
         .execute()
     )
     return response.data
+
+
+
+
 @app.post("/adopt")
 def adopt (body: dict = Body(...)):
     user_id = body.get("user_id")
@@ -217,6 +221,17 @@ def _public_url(bucket: str, path: str) -> str:
         return resp
     
     return (resp.get("data", {}) or {}).get("publicUrl") or ""
+
+@app.get("/get_pet")
+def get_pet_image(user_id: str):
+    res = supabase.table("petSystem").select(
+        "pet_name"
+    ).eq("user_uuid", user_id).execute()
+    ans= _public_url("pet", res)
+    return ans
+
+
+
 
 
 @app.get("/static_pet")

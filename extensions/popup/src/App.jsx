@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
-import Form from './formTracking';
-import Petsystem from './petsSystem'
+import Form from './features/formTracking';
+import Petsystem from './features/petsSystem'
+
 export default function App() {
   const [userId, setUserId] = useState(null);
   const [isTracking, setIsTracking] = useState(false);
@@ -46,6 +47,8 @@ export default function App() {
       }
     });
 
+
+    
     chrome.runtime.onMessage.addListener((msg) => {
       if (msg.action === "email-generated") {
         console.log(" Email received:", msg.email);
@@ -55,6 +58,8 @@ export default function App() {
       }
     });
   }, []);
+
+
 
   const handleLogin = () => {
     const userEmail = emailInputRef.current?.value || "";

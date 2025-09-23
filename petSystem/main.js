@@ -23,5 +23,23 @@ function createWindow() {
     });
 }
 
+async function fetchPet(uid) {
+    const res = await fetch(`http://localhost:8000/pet/current?user_id=${uid}`);
+    const pet = await res.json();
+    document.getElementById("pet-name").textContent = pet.pet_name;
+    document.getElementById("pet-image").src = pet.pet_image_url;
+}
+
 app.whenReady().then(createWindow);
 app.on('window-all-closed', () => app.quit());
+
+app.on("second-instance", (_event, argv) => {
+    const deep = argv.find(a => a.startsWith("quickfollowup://"));
+    if (deep) {
+        const url = new URL(deep);
+        currentUserId = url.searchParams.get("user_id");
+        win.webContents.send("set-user", currentUserId);
+        fetchPet(currentUserId);
+
+    }
+});
