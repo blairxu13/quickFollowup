@@ -132,46 +132,6 @@ function fetchReadableLinks (company,subject, body) {
 }
 
 
-function sendEmailWithGmailAPI(to, subject, body) {
-
-  chrome.identity.getAuthToken({ interactive: true }, function(token) {
-    if (chrome.runtime.lastError) {
-      console.error("Auth failed:", chrome.runtime.lastError.message);
-      return;
-    }
-
-    const emailLines = [
-      `To: ${to}`,
-      `Subject: ${subject}`,
-      "Content-Type: text/plain; charset=UTF-8",
-      "",
-      body
-    ];
-
-    const email = emailLines.join("\n");
-
-    const base64EncodedEmail = btoa(unescape(encodeURIComponent(email)))
-      .replace(/\+/g, '-').replace(/\//g, '_');
-
-    fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/send", {
-      method: "POST",
-      headers: {
-        Authorization: "Bearer " + token,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        raw: base64EncodedEmail
-      })
-    })
-      .then(res => res.json())
-      .then(data => {
-        console.log("✅ Email sent successfully:", data);
-      })
-      .catch(err => {
-        console.error("❌ Failed to send email:", err);
-      });
-  });
-}
 
 chrome.storage.local.get(["isTracking"], (result) => {
     if (result.isTracking) {
@@ -266,9 +226,6 @@ chrome.runtime.onMessage.addListener((msg, sender) => {
     });
   }
     console.log("📨 Received message!:", msg);
-    if (msg.action === "send_gmail") {
-      sendEmailWithGmailAPI(msg.to, msg.subject, msg.body);
-    }
     if (msg.action === "startpasting") {
       console.log("i am in pasting")
       // connect vs sales navigator?

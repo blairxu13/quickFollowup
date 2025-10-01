@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+        "target": "ES2020",
+        "module": "ESNext",
+        "lib": [
+            "ES2020",
+            "DOM"
+        ],
+        "strict": true,
+        "moduleResolution": "Bundler",
+        "types": [
+            "chrome-types"
+        ]
+    },
+    "include": [
+        "popup/src/**/*"
+    ]
+}

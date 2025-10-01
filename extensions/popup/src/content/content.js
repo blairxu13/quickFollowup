@@ -1,7 +1,7 @@
 //need to see if it's triggered
 console.log("📥 content.js loaded");
 chrome.runtime.onMessage.addListener((msg) => {
-  if (msg.action === "prefill_message") {
+  if (msg.action === "prifill_message") {
     console.log("📥 start prefilling _message navigator");
 
     const observer = new MutationObserver(() => {
