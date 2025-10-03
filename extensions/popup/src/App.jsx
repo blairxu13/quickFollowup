@@ -88,7 +88,7 @@ export default function App() {
 
   // --- Existing handlers (unchanged) ---
   const handleLogin = () => {
-    const userEmail = emailInputRef.current?.value || "";
+    const useFrEmail = emailInputRef.current?.value || "";
     const file = fileRef.current?.files[0];
     if (!file) {
       console.error("No file selected!");

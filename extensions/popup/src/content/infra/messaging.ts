@@ -1,4 +1,4 @@
-import {ACTION, RECRUITER} from '../../shared/types';
+import {ACTION} from '../../shared/types';
 import {attachObserverOnce} from '../handlers/observer';
 import {scrapeJobInfoEarly} from '../handlers/scrapeJob';
 import {extractLinkedInLinks} from '../handlers/extractlinks';
@@ -10,10 +10,10 @@ if (msg == ACTION.CONNECTION.START_OBSERVING) {
         attachObserverOnce();
         return true;
 
-    } else if (msg == RECRUITER.RECRUITER_LINKS_FOUND) {
+    } else if (msg == ACTION.RECRUITER.RECRUITER_LINKS_FOUND) {
         chrome.runtime.sendMessage({ action: "close_this_tab" });
 
-    } else if (msg == RECRUITER.READY_TO_CONNECT) {
+    } else if (msg == ACTION.RECRUITER.READY_TO_CONNECT) {
         console.log("📥 start prefilling _ready to connect");
     
         const observer = new MutationObserver(() => {
@@ -58,3 +58,14 @@ if (
   }
   
 
+
+
+  window.addEventListener("message", (event) => {
+    if (event.source !== window) return;
+    if (event.data.type === "dm_check_result") {
+      chrome.runtime.sendMessage({
+        action: event.data.dmable ? "recruiter_dm_ready" : "recruiter_not_dmable"
+      });
+    }
+  });
+  

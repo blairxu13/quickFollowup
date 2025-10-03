@@ -1,25 +1,85 @@
-import {RECRUITER, ACTION} from '../../shared/types';
-import {scanUntilFirstDMabl, fetchReadableLinks} from '../handlers/recruiter'
+import { ACTION } from '../../shared/types';
+import { scanUntilFirstDMable, fetchReadableLinks } from '../handlers/recruiter';
+import { trackingTabs } from '../handlers/checkjobsites';
+import { jsonPost } from './apiClient';
+import { emailList } from './app';
+
 
 chrome.runtime.onMessage.addListener((msg) => {
     //connection between background and content
-    if (msg == ACTION.CONNECTION.APPLY_BUTTON_CLICKED ) {
+    if (msg == ACTION.CONNECTION.APPLY_BUTTON_CLICKED && !sentOnce) {
         //extract the local object
-        return true;
+        console.log("after button clicked");
+        // sentOnce = true;
+
+
+        //sent once, glith here??? 
+        chrome.storage.local.get(["user_id"], async (result) => {
+            const job = {
+                ...msg.job,                  // original job info from content.js
+                user_id: result.user_id,    // add user_id from local storage
+                isSent: false
+            };
+            await emailList(job, result.user_id);
+            chrome.runtime.sendMessage({ action: "emails-fetched" });
+
+
+        });
+
+
+
+
     } else if (msg == ACTION.CONNECTION.START_OBSERVING) {
-    
-    }else if (msg == RECRUITER.CLOSE_THIS_TAB) {
+
+    } else if (msg == ACTION.RECRUITER.CLOSE_THIS_TAB) {
         chrome.storage.local.get("searchTabId", ({ searchTabId }) => {
             if (searchTabId) {
-              chrome.tabs.remove(searchTabId);
-              chrome.storage.local.remove("searchTabId"); // cleanup
+                chrome.tabs.remove(searchTabId);
+                chrome.storage.local.remove("searchTabId"); // cleanup
             }
-          });
-    } else if (msg == RECRUITER.RECRUITER_LINKS_FOUND) {
+        });
+    } else if (msg == ACTION.RECRUITER.RECRUITER_LINKS_FOUND) {
         scanUntilFirstDMable();
 
-    } else if (msg == RECRUITER.ACTION.START_PASTING) {
+    } else if (msg == ACTION.CONNECTION.START_TRACKING) {
+        trackingTabs();
+    } else if (msg == ACTION.RECRUITER.START_PASTING) {
         fetchReadableLinks();
     }
 
+    return;
+});
+
+
+
+chrome.runtime.onInstalled.addListener(() => {
+    console.log("🆕 Extension installed or reloaded");
+
+    chrome.storage.local.get(["isTracking"], (result) => {
+        if (result.isTracking) {
+            console.log("Starting tracking after install/reload");
+            trackingTabs();
+        }
+    });
+});
+
+chrome.runtime.onStartup.addListener(() => {
+    console.log("tracking when Chrome restarted");
+    chrome.storage.local.get(["isTracking"], (result) => {
+        if (result.isTracking) {
+            trackingTabs();
+        }
+    });
+});
+
+
+chrome.action.onClicked.addListener(() => {
+    chrome.windows.create({
+        url: chrome.runtime.getURL("popup/index.html"),
+        type: "popup",
+        width: 625,
+        height: 575,
+        top: 100,
+        left: 100
+    });
 });
