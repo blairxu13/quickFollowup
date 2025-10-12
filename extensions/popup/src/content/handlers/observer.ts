@@ -1,6 +1,6 @@
 export function attachObserverOnce() {
     let sent = false;
-      console.log("i am in observeronce")
+    console.log("i am in observeronce")
     const obs = new MutationObserver(() => {
       if (sent) return; 
       const txt = document.body.innerText.toLowerCase();

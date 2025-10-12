@@ -4,6 +4,7 @@ import { trackingTabs } from '../handlers/checkjobsites';
 import { jsonPost } from './apiClient';
 import { emailList } from './app';
 
+let sentOnce = true;
 
 chrome.runtime.onMessage.addListener((msg) => {
     //connection between background and content
@@ -20,16 +21,15 @@ chrome.runtime.onMessage.addListener((msg) => {
                 user_id: result.user_id,    // add user_id from local storage
                 isSent: false
             };
-            await emailList(job, result.user_id);
-            chrome.runtime.sendMessage({ action: "emails-fetched" });
+            const list = await emailList(job, result.user_id);
+            chrome.storage.local.set({ emailList: list }, () => {
+                chrome.runtime.sendMessage({ action: "emails-fetched" });
+            });
+          
 
 
         });
 
-
-
-
-    } else if (msg == ACTION.CONNECTION.START_OBSERVING) {
 
     } else if (msg == ACTION.RECRUITER.CLOSE_THIS_TAB) {
         chrome.storage.local.get("searchTabId", ({ searchTabId }) => {
@@ -39,21 +39,21 @@ chrome.runtime.onMessage.addListener((msg) => {
             }
         });
     } else if (msg == ACTION.RECRUITER.RECRUITER_LINKS_FOUND) {
-        scanUntilFirstDMable();
+        scanUntilFirstDMable("slay", "slay", "slay");
 
     } else if (msg == ACTION.CONNECTION.START_TRACKING) {
         trackingTabs();
     } else if (msg == ACTION.RECRUITER.START_PASTING) {
-        fetchReadableLinks();
+        fetchReadableLinks("slay", "slay", "slay");
     }
 
-    return;
+    return true;
 });
 
 
 
 chrome.runtime.onInstalled.addListener(() => {
-    console.log("🆕 Extension installed or reloaded");
+    console.log(" Extension installed or reloaded");
 
     chrome.storage.local.get(["isTracking"], (result) => {
         if (result.isTracking) {

@@ -1,16 +1,18 @@
 interface storedJob {
     job_url: string,
-    job_title: string,
+    job_title: string | undefined,
     job_company: string,
-    job_description: string
+    job_description: string | undefined
 }
 
 
 //when scrape workday.com
-function waitFor(selector:string, minLen = 30, cb: (txt: string) => void) {
+function waitFor(selector: string, minLen = 30, cb: (txt: string) => void) {
     const iv = setInterval(() => {
-        const el = document.querySelector(selector);
+        const el = document.querySelector(selector) as HTMLElement | null;
         const txt = el?.innerText?.trim() || "";
+
+
         if (txt.length >= minLen) {
             clearInterval(iv);
             cb(txt);
@@ -33,7 +35,7 @@ export function scrapeJobInfoEarly() {
 
     const looksLikeJob = /(job|jobs|career|careers)/.test(pathname) && /\d+/.test(pathname);
 
-    let job_title: string, job_company: string, job_description: string;
+    let job_title: string | undefined, job_company: string, job_description: string | undefined;
 
 
     if (site.includes("myworkdayjobs.com") &&
@@ -72,18 +74,19 @@ export function scrapeJobInfoEarly() {
             return;
         }
 
-        job_title = document.querySelector(".job__title")?.innerText?.trim();
-        job_company = pathParts[1];
-        job_description = document
-            .querySelector(".job__description")
-            ?.innerText
-            ?.trim();
+        const titleEl = document.querySelector(".job__title") as HTMLElement | null;
+        const descEl = document.querySelector(".job__description") as HTMLElement | null;
 
+        job_title = titleEl?.innerText?.trim();
+        job_company = pathParts[1];
+        job_description = descEl?.innerText?.trim();
+        
         saveJobData({ job_url: window.location.href, job_title, job_company, job_description });
         return;
     }
 
-
+ //need to add jobs.lever.co, jd and application is in different sites
+ //need to add ashbyhq, but jd and application is in different sites?
 
     console.log("⛔ Not a job detail page, skipping.");
 }

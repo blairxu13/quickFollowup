@@ -9,10 +9,11 @@
         "strict": true,
         "moduleResolution": "Bundler",
         "types": [
-            "chrome-types"
+            "chrome-types",
+            "vite/client"
         ]
     },
     "include": [
-        "popup/src/**/*"
+        "popup/src"
     ]
 }

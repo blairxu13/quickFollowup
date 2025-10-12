@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import Form from './features/formTracking';
 import Petsystem from './features/petsSystem';
+import {getUnsentEmailsList, logUsers} from './background/infra/helper'
 import { ClipboardList, PawPrint, Sparkles } from "lucide-react";
 
 export default function App() {
@@ -49,14 +50,13 @@ export default function App() {
       return next;
     });
   }
+//need to add how to deal with the list here?
 
-  // --- Existing effects (unchanged) ---
   useEffect(() => {
     chrome.storage.local.get("user_id", (result) => {
       if (!result.user_id) return;
-      fetch(`http://localhost:8000/get_unsent_emails?user_id=${result.user_id}`)
-        .then(res => res.json())
-        .then(setEmailList);
+      list = getUnsentEmailsList(result.user_id);
+      setEmailList(list);
     });
   }, []);
 
@@ -81,7 +81,7 @@ export default function App() {
         console.log(" Email received:", msg.email);
       }
       if (msg.action === "emails-fetched") {
-        setEmailList(msg.emails);
+        setEmailList(msg.list);
       }
     });
   }, []);
@@ -106,22 +106,20 @@ export default function App() {
       formData.append("userEmail", userEmail);
       formData.append("UserResume", file);
 
-      fetch("http://localhost:8000/add_users", {
-        method: "POST",
-        body: formData,
-      });
+      logUsers(formData);
+      
     });
   };
 
-  const handleSendEmail = () => {
-    if (!selectedEmail) return;
-    chrome.runtime.sendMessage({
-      action: "send_gmail",
-      to: "jadepiper34@gmail.com",
-      subject: selectedEmail.emailSubject,
-      body: selectedEmail.emailText,
-    });
-  };
+  // const handleSendEmail = () => {
+  //   if (!selectedEmail) return;
+  //   chrome.runtime.sendMessage({
+  //     action: "send_gmail",
+  //     to: "jadepiper34@gmail.com",
+  //     subject: selectedEmail.emailSubject,
+  //     body: selectedEmail.emailText,
+  //   });
+  // };
 
   const handlePaste = () => {
     if (!selectedEmail) return;

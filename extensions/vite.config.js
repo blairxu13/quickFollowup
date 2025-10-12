@@ -8,7 +8,8 @@ export default defineConfig({
     rollupOptions: {
       input: {
         popup: resolve(__dirname, 'popup/index.html'),
-        background: resolve(__dirname, 'src/background/index.ts')
+        background: resolve(__dirname, 'src/background/infra/Messaging.ts'),
+        background: resolve(__dirname, 'src/content/infra/messaging.ts'),
       }
     },
     outDir: 'dist',
