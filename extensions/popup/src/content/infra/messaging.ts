@@ -11,29 +11,10 @@ chrome.runtime.onMessage.addListener((msg) => {
 
 
   } else if (msg == ACTION.RECRUITER.RECRUITER_LINKS_FOUND) {
-    chrome.runtime.sendMessage({ action: "close_this_tab" });
+    chrome.runtime.sendMessage({ action: ACTION.RECRUITER.CLOSE_THIS_TAB });
 
   } else if (msg == ACTION.RECRUITER.READY_TO_CONNECT) {
     console.log("📥 start prefilling _ready to connect");
-
-    const observer = new MutationObserver(() => {
-      // const currentURL = window.location.href;
-      const connectBox: HTMLTextAreaElement | null = document.querySelector("textarea#custom-message");
-      if (!connectBox) return;
-      connectBox.value = msg.body;
-      connectBox.dispatchEvent(new Event("input", { bubbles: true }));
-      console.log("✅ Prefilled Sales Navigator message");
-      observer.disconnect();
-
-    });
-
-    observer.observe(document.body, { childList: true, subtree: true });
-
-    // Stop after 10s if not found
-    setTimeout(() => {
-      console.warn("⏱️ Timeout: message UI not found.");
-      observer.disconnect();
-    }, 10000);
 
 
 
@@ -47,9 +28,10 @@ if (
   //needs to add more condition here
 ) {
   chrome.storage.local.get(["shouldRunExtractor", "draftSubject", "draftBody"], (res) => {
-    if (res.shouldRunExtractor) {
+    if (res.shouldRunExtractor && res.draftSubject && res.draftBody) {
       console.log("🟢 Trigger conditions met. Extracting...");
-      chrome.storage.local.remove("shouldRunExtractor"); // clear so it doesn't retrigger
+      chrome.storage.local.remove("shouldRunExtractor"); 
+      //callback always fires no matter what but this part will be silently skipped if condition is not met
 
       setTimeout(() => {
         extractLinkedInLinks();

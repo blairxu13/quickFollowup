@@ -1,3 +1,6 @@
+import {ACTION} from '../../shared/types'
+
+
 export function fetchReadableLinks(company: string, subject: string, body: string) {
   console.log("hi i am in fetch readable links!")
   const query = `site:linkedin.com/in recruiter ${company}`;
@@ -14,7 +17,7 @@ export function fetchReadableLinks(company: string, subject: string, body: strin
 
 
 
-export function scanUntilFirstDMable(links: string, subject: string, body: string) {
+export function scanUntilFirstDMable(links: string []) {
   let found = false;
 
   //for sales navigator
@@ -33,7 +36,28 @@ export function scanUntilFirstDMable(links: string, subject: string, body: strin
   //for connect 
   function sendPrefillConnect(tabId: any, connectBody: any, retries = 10) {
 
-    chrome.tabs.sendMessage(tabId, { action: "ready to connect", connectBody });
+     
+    chrome.tabs.sendMessage(tabId, { action: ACTION.RECRUITER.READY_TO_CONNECT, connectBody });
+    const observer = new MutationObserver(() => {
+      // const currentURL = window.location.href;
+      const connectBox: HTMLTextAreaElement | null = document.querySelector("textarea#custom-message");
+      if (!connectBox) return;
+      connectBox.value = connectBody;
+      connectBox.dispatchEvent(new Event("input", { bubbles: true }));
+      console.log("✅ Prefilled Sales Navigator message");
+      observer.disconnect();
+
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    // Stop after 10s if not found
+    setTimeout(() => {
+      console.warn("⏱️ Timeout: message UI not found.");
+      observer.disconnect();
+    }, 10000);
+
+
 
   }
 
@@ -53,7 +77,7 @@ export function scanUntilFirstDMable(links: string, subject: string, body: strin
             const btn = buttons.find(el => el.innerText.trim() === "Connect");
 
             if (btn) {
-              chrome.runtime.sendMessage({ action: "recruiter_dm_ready" });
+              chrome.runtime.sendMessage({ action: ACTION.RECRUITER.RECRUITER_DM_READY });
               observer.disconnect();
             }
           });
@@ -65,7 +89,7 @@ export function scanUntilFirstDMable(links: string, subject: string, body: strin
 
           setTimeout(() => {
             observer.disconnect();
-            chrome.runtime.sendMessage({ action: "recruiter_not_dmable" });
+            chrome.runtime.sendMessage({ action: ACTION.RECRUITER.RECRUITER_NOT_DMABLE });
           }, 5000);
         }
       });
@@ -77,7 +101,7 @@ export function scanUntilFirstDMable(links: string, subject: string, body: strin
 
         if (found) return;
 
-        if (msg.action === "recruiter_dm_ready" && !found) {
+        if (msg.action === ACTION.RECRUITER.RECRUITER_DM_READY && !found) {
           found = true;
           chrome.runtime.onMessage.removeListener(handler);
 
@@ -107,7 +131,10 @@ export function scanUntilFirstDMable(links: string, subject: string, body: strin
 
           // chrome.tabs.onUpdated.addListener(listener);
           // chrome.tabs.update(tabId, { active: true });
-          sendPrefillConnect(tabId, body);
+          chrome.storage.local.get(["shouldRunExtractor", "draftSubject", "draftBody"], (res) => { 
+            sendPrefillConnect(tabId,res.draftBody)
+           }
+          );
 
         } else {
           chrome.tabs.remove(tabId);

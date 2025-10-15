@@ -1,3 +1,5 @@
+import {ACTION} from '../../shared/types'
+
 export function extractLinkedInLinks() {
     console.log("in extarct links from first poage of google")
     const anchors = Array.from(document.querySelectorAll('a'));
@@ -24,9 +26,9 @@ export function extractLinkedInLinks() {
     console.log("✅ Extracted:", cleanedLinks);
   
     chrome.runtime.sendMessage({
-      action: "recruiter_links_found",
+      action: ACTION.RECRUITER.RECRUITER_LINKS_FOUND,
       links: cleanedLinks
     });
      
-    chrome.runtime.sendMessage({ action: "close_this_tab" });
+    chrome.runtime.sendMessage({ action: ACTION.RECRUITER.CLOSE_THIS_TAB });
   }

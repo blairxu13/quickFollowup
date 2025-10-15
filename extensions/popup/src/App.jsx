@@ -3,6 +3,7 @@ import Form from './features/formTracking';
 import Petsystem from './features/petsSystem';
 import {getUnsentEmailsList, logUsers} from './background/infra/helper'
 import { ClipboardList, PawPrint, Sparkles } from "lucide-react";
+import {ACTION} from '/shared/types'
 
 export default function App() {
   const [userId, setUserId] = useState(null);
@@ -18,7 +19,7 @@ export default function App() {
   const emailInputRef = useRef(null);
   const fileRef = useRef(null);
 
-  // --- Tabs helpers ---
+
   function openEmailTab(email) {
     const id = `email:${String(email.id ?? email.emailSubject ?? Math.random())}`;
     setTabs(prev => (prev.some(t => t.id === id) ? prev : [...prev, {
@@ -69,7 +70,7 @@ export default function App() {
       if (!result.isTracking) {
         chrome.storage.local.set({ isTracking: true }, () => { });
       }
-      chrome.runtime.sendMessage({ action: "start-tracking" }, () => {
+      chrome.runtime.sendMessage({ action: ACTION.CONNECTION.START_TRACKING  }, () => {
         if (chrome.runtime.lastError) {
           console.warn("?Background error:", chrome.runtime.lastError.message);
         }
@@ -77,16 +78,16 @@ export default function App() {
     });
 
     chrome.runtime.onMessage.addListener((msg) => {
-      if (msg.action === "email-generated") {
+      if (msg.action === ACTION.RENDER.EMAIL_GENERATED) {
         console.log(" Email received:", msg.email);
       }
-      if (msg.action === "emails-fetched") {
+      if (msg.action === ACTION.RENDER.EMAIL_FETCHED) {
         setEmailList(msg.list);
       }
     });
   }, []);
 
-  // --- Existing handlers (unchanged) ---
+
   const handleLogin = () => {
     const useFrEmail = emailInputRef.current?.value || "";
     const file = fileRef.current?.files[0];
@@ -99,7 +100,7 @@ export default function App() {
     setIsTracking(true);
 
     chrome.storage.local.set({ user_id: newId, isTracking: true }, () => {
-      chrome.runtime.sendMessage({ action: "start-tracking" });
+      chrome.runtime.sendMessage({ action: ACTION.CONNECTION.START_TRACKING });
 
       const formData = new FormData();
       formData.append("useruuid", newId);
@@ -124,7 +125,7 @@ export default function App() {
   const handlePaste = () => {
     if (!selectedEmail) return;
     chrome.runtime.sendMessage({
-      action: "startpasting",
+      action: ACTION.RECRUITER.START_PASTING,
       company: selectedEmail.company,
       subject: selectedEmail.emailSubject,
       body: selectedEmail.emailText

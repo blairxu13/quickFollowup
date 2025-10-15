@@ -5,6 +5,11 @@ import { jsonPost } from './apiClient';
 import { emailList } from './app';
 
 let sentOnce = true;
+interface generatedFollowUp  {
+    jt: string;
+    jd: string;
+}
+
 
 chrome.runtime.onMessage.addListener((msg) => {
     //connection between background and content
@@ -23,7 +28,7 @@ chrome.runtime.onMessage.addListener((msg) => {
             };
             const list = await emailList(job, result.user_id);
             chrome.storage.local.set({ emailList: list }, () => {
-                chrome.runtime.sendMessage({ action: "emails-fetched" });
+                chrome.runtime.sendMessage({ action: ACTION.RENDER.EMAIL_FETCHED});
             });
           
 
@@ -39,12 +44,14 @@ chrome.runtime.onMessage.addListener((msg) => {
             }
         });
     } else if (msg == ACTION.RECRUITER.RECRUITER_LINKS_FOUND) {
-        scanUntilFirstDMable("slay", "slay", "slay");
+        
+        
+        scanUntilFirstDMable(msg.cleanedLinks);
 
     } else if (msg == ACTION.CONNECTION.START_TRACKING) {
         trackingTabs();
     } else if (msg == ACTION.RECRUITER.START_PASTING) {
-        fetchReadableLinks("slay", "slay", "slay");
+        fetchReadableLinks( msg.company, msg.subject, msg.body);
     }
 
     return true;
