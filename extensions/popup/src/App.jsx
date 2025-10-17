@@ -3,7 +3,7 @@ import Form from './features/formTracking';
 import Petsystem from './features/petsSystem';
 import {getUnsentEmailsList, logUsers} from './background/infra/helper'
 import { ClipboardList, PawPrint, Sparkles } from "lucide-react";
-import {ACTION} from '/shared/types'
+import {ACTION} from './shared/types'
 
 export default function App() {
   const [userId, setUserId] = useState(null);

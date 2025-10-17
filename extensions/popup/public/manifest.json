@@ -12,6 +12,7 @@
   ],
   "description": "Chrome extension for job seekers.",
   "action": {
+  
     "default_title": "Open Floating Window"
   },
   "host_permissions": [
@@ -23,7 +24,7 @@
         "<all_urls>"
       ],
       "js": [
-        "popup/content.js"
+        "assets/content-BsJ5qXSq.js"
       ],
       "run_at": "document_idle"
     }
@@ -35,6 +36,7 @@
     ]
   },
   "background": {
-    "service_worker": "popup/background.js"
+    "service_worker": "assets/background-Cekrhl50.js",
+    "type": "module"
   }
 }
