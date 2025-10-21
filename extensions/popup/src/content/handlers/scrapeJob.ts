@@ -1,8 +1,9 @@
 interface storedJob {
-    job_url: string,
+    url: string,
+    user_id: string,
     job_title: string | undefined,
-    job_company: string,
-    job_description: string | undefined
+    company: string,
+    jd: string | undefined
 }
 
 
@@ -27,7 +28,7 @@ function saveJobData(job: storedJob) {
 }
 
 
-export function scrapeJobInfoEarly() {
+export function scrapeJobInfoEarly(user: any) {
     const site = window.location.hostname;
     const pathname = window.location.pathname;
     const pathParts = pathname.split("/");
@@ -35,7 +36,7 @@ export function scrapeJobInfoEarly() {
 
     const looksLikeJob = /(job|jobs|career|careers)/.test(pathname) && /\d+/.test(pathname);
 
-    let job_title: string | undefined, job_company: string, job_description: string | undefined;
+    let job_title: string | undefined, company: string, jd: string | undefined;
 
 
     if (site.includes("myworkdayjobs.com") &&
@@ -47,15 +48,15 @@ export function scrapeJobInfoEarly() {
             pathParts[3] === "job" &&
             looksLikeJob
         ) {
-            job_company = site.split(".")[0];
+            company = site.split(".")[0];
 
             waitFor('[data-automation-id="jobPostingHeader"]', 5, (titleText: string) => {
                 job_title = titleText;
 
                 waitFor('[data-automation-id="jobPostingDescription"]', 30, (desc: string) => {
-                    job_description = desc;
+                    jd = desc;
 
-                    saveJobData({ job_url: window.location.href, job_title, job_company, job_description });
+                    saveJobData({  user_id: user, url: window.location.href, job_title, company, jd });
                 });
             });
 
@@ -78,10 +79,10 @@ export function scrapeJobInfoEarly() {
         const descEl = document.querySelector(".job__description") as HTMLElement | null;
 
         job_title = titleEl?.innerText?.trim();
-        job_company = pathParts[1];
-        job_description = descEl?.innerText?.trim();
+        company = pathParts[1];
+        jd = descEl?.innerText?.trim();
         
-        saveJobData({ job_url: window.location.href, job_title, job_company, job_description });
+        saveJobData({ user_id: user, url: window.location.href, job_title, company, jd });
         return;
     }
 

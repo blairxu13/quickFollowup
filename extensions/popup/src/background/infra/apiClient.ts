@@ -1,7 +1,7 @@
 export type APIok<T> = { ok: true; data: T };
 export type APIfail = { ok: false; error: { message: string } };
 export type APIresult<T> = APIok<T> | APIfail;
-const BASE = import.meta.env.VITE_track_application_url;
+const BASE = 'http://localhost:8000/';
 
 
 interface userBody {

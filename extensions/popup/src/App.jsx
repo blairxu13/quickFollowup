@@ -1,9 +1,9 @@
 import { useEffect, useState, useRef } from "react";
 import Form from './features/formTracking';
 import Petsystem from './features/petsSystem';
-import {getUnsentEmailsList, logUsers} from './background/infra/helper'
+import { getUnsentEmailsList, logUsers } from './background/infra/helper'
 import { ClipboardList, PawPrint, Sparkles } from "lucide-react";
-import {ACTION} from './shared/types'
+import { ACTION } from './shared/types'
 
 export default function App() {
   const [userId, setUserId] = useState(null);
@@ -51,30 +51,40 @@ export default function App() {
       return next;
     });
   }
-//need to add how to deal with the list here?
+  //need to add how to deal with the list here?
 
   useEffect(() => {
     chrome.storage.local.get("user_id", (result) => {
       if (!result.user_id) return;
-      list = getUnsentEmailsList(result.user_id);
-      setEmailList(list);
+
+      // define an inner async function
+      async function fetchEmails() {
+        console.log("📡 fetching unsent emails for", result.user_id);
+        const res = await getUnsentEmailsList(result.user_id);
+        console.log("✅ fetched result", res);
+
+        if (res.ok) setEmailList(res.data);
+      }
+
+      fetchEmails(); // call it
     });
   }, []);
 
   useEffect(() => {
+    console.log("useeffect 1")
     chrome.storage.local.get(["user_id", "isTracking"], (result) => {
+      console.log("useeffect 1.1")
       if (!result.user_id) return;
+      console.log("useeffect 1.2")
       setUserId(result.user_id);
       setIsTracking(result.isTracking || false);
-
+      console.log("useeffect 1.3")
       if (!result.isTracking) {
         chrome.storage.local.set({ isTracking: true }, () => { });
       }
-      chrome.runtime.sendMessage({ action: ACTION.CONNECTION.START_TRACKING  }, () => {
-        if (chrome.runtime.lastError) {
-          console.warn("?Background error:", chrome.runtime.lastError.message);
-        }
-      });
+      console.log("useeffect 1.4")
+      chrome.runtime.sendMessage({ action: ACTION.CONNECTION.START_TRACKING });
+      console.log("useeffect 2")
     });
 
     chrome.runtime.onMessage.addListener((msg) => {
@@ -82,7 +92,8 @@ export default function App() {
         console.log(" Email received:", msg.email);
       }
       if (msg.action === ACTION.RENDER.EMAIL_FETCHED) {
-        setEmailList(msg.list);
+        const list = msg.list || []; // default to empty
+        setEmailList(list);
       }
     });
   }, []);
@@ -108,7 +119,7 @@ export default function App() {
       formData.append("UserResume", file);
 
       logUsers(formData);
-      
+
     });
   };
 

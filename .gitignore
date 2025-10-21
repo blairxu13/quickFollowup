@@ -19,7 +19,7 @@ __pycache__/
 # Electron big builds
 extensions/**/node_modules/
 petSystem/**/node_modules/
-extensions/dist/ 
+
 petSystem/dist/         
 petSystem/out/        
 

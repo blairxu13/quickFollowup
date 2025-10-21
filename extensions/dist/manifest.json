@@ -8,11 +8,12 @@
     "tabs",
     "activeTab",
     "scripting",
-    "identity"
+    "identity",
+    "webNavigation",
+    "alarms"
   ],
   "description": "Chrome extension for job seekers.",
   "action": {
-  
     "default_title": "Open Floating Window"
   },
   "host_permissions": [
@@ -24,7 +25,7 @@
         "<all_urls>"
       ],
       "js": [
-        "assets/content-BsJ5qXSq.js"
+        "assets/content.js"
       ],
       "run_at": "document_idle"
     }
@@ -36,7 +37,7 @@
     ]
   },
   "background": {
-    "service_worker": "assets/background-Cekrhl50.js",
+    "service_worker": "assets/background-BAzd01GG.js",
     "type": "module"
   }
 }

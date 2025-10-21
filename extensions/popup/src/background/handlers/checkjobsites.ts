@@ -1,5 +1,6 @@
 import {JOBSITES_TYPE, JOBSITES} from '../../shared/types';
-
+import {ACTION} from '../../shared/types';
+import {completedTabs} from '../infra/Messaging'
 const sites = Object.values(JOBSITES); 
 
 function isJobSite(url: string): url is JOBSITES_TYPE {
@@ -26,7 +27,24 @@ export function trackingTabs() {
           console.log("⛔ Not a tracked job site:", tab.url);
         } else {
           console.log("🟢 Job-related site loaded:", tab.url);
-          chrome.tabs.sendMessage(tabId, { action: "start-observing" });
+          console.log("before sending out start obs")
+          chrome.runtime.onMessage.addListener((msg, sender) => {
+            if (msg.action === 'READY') {
+              const tabId = sender.tab?.id;
+              if (!tabId) return;
+          
+              if (completedTabs.has(tabId)) {
+                console.log('⚠️ Tab already completed, skipping START_OBSERVING');
+                return;
+              }
+          
+              console.log('✅ Content ready, sending START_OBSERVING');
+              chrome.tabs.sendMessage(tabId, { action: ACTION.CONNECTION.START_OBSERVING });
+            }
+            return undefined;
+          });
+        
+          console.log("after sending out start obs")
 
         
        }

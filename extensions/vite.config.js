@@ -12,7 +12,6 @@ export default defineConfig({
       input: {
         popup: resolve(__dirname, 'popup/index.html'),
         background: resolve(__dirname, 'popup/src/background/infra/Messaging.ts'),
-        content: resolve(__dirname, 'popup/src/content/infra/messaging.ts'),
       }
     },
     outDir: 'dist',

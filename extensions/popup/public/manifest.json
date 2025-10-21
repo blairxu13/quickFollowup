@@ -2,17 +2,20 @@
   "manifest_version": 3,
   "name": "Jobs Helper",
   "version": "2.0",
+
   "permissions": [
     "windows",
     "storage",
     "tabs",
     "activeTab",
     "scripting",
-    "identity"
+    "identity",
+    "webNavigation",
+    "alarms"
+
   ],
   "description": "Chrome extension for job seekers.",
   "action": {
-  
     "default_title": "Open Floating Window"
   },
   "host_permissions": [
@@ -36,7 +39,7 @@
     ]
   },
   "background": {
-    "service_worker": "assets/background-Cekrhl50.js",
+    "service_worker": "assets/background-CJO-3CXu.js",
     "type": "module"
   }
 }

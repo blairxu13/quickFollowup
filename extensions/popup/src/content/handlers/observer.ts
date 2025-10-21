@@ -1,3 +1,5 @@
+import {ACTION} from '../../shared/types'
+
 export function attachObserverOnce() {
     let sent = false;
     console.log("i am in observeronce")
@@ -19,7 +21,7 @@ export function attachObserverOnce() {
   
         chrome.storage.local.get(["pendingJob"], ({ pendingJob }) => {
           if (pendingJob) {
-            chrome.runtime.sendMessage({ action: "apply-button-clicked", job: pendingJob });
+            chrome.runtime.sendMessage({ action: ACTION.CONNECTION.APPLY_BUTTON_CLICKED, job: pendingJob });
             chrome.storage.local.remove("pendingJob")
             console.log("✅ Application confirmed → sent job to background",pendingJob);
           }

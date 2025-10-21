@@ -2,8 +2,10 @@ import { sentApplication, getUnsentEmailsList } from "./helper";
 
 export async function emailList (job: {}[], userId: string) {
     try {
-        await sentApplication ({ ...job, user_id: userId});
+        console.log("mother")
+        await sentApplication (job, userId);
         const emailsRes = await getUnsentEmailsList(userId);
+        console.log("son")
         return emailsRes;
       
     }catch (e) {
