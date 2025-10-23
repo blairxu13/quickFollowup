@@ -30,16 +30,19 @@ export function trackingTabs() {
           console.log("before sending out start obs")
           chrome.runtime.onMessage.addListener((msg, sender) => {
             if (msg.action === 'READY') {
+              //waiting for content.js to be in injected in successfully
               const tabId = sender.tab?.id;
               if (!tabId) return;
           
               if (completedTabs.has(tabId)) {
                 console.log('⚠️ Tab already completed, skipping START_OBSERVING');
                 return;
+              }else {
+                console.log('✅ Content ready, sending START_OBSERVING');
+                chrome.tabs.sendMessage(tabId, { action: ACTION.CONNECTION.START_OBSERVING });
               }
           
-              console.log('✅ Content ready, sending START_OBSERVING');
-              chrome.tabs.sendMessage(tabId, { action: ACTION.CONNECTION.START_OBSERVING });
+           
             }
             return undefined;
           });

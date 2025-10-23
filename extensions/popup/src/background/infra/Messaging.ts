@@ -51,7 +51,7 @@ chrome.runtime.onMessage.addListener((msg, sender) => {
 
         });
 
-console.log("hello america ")
+
     } else if (msg.action == ACTION.RECRUITER.CLOSE_THIS_TAB) {
         chrome.storage.local.get("searchTabId", ({ searchTabId }) => {
             if (searchTabId) {

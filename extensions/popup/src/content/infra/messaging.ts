@@ -4,6 +4,9 @@ import { scrapeJobInfoEarly } from '../handlers/scrapeJob';
 import { extractLinkedInLinks } from '../handlers/extractlinks';
 
 let user_id: any;
+export const completedTabs = new Set();
+chrome.storage.local.set({ completedTabs: Array.from(completedTabs) });
+
 chrome.storage.local.get("user_id", (result) => {
   user_id = result.user_id;
 })
@@ -12,6 +15,10 @@ console.log("in content.js");
 chrome.runtime.onMessage.addListener((msg) => {
   //connection between background and content
   if (msg.action == ACTION.CONNECTION.START_OBSERVING) {
+  //   if (!completedTabs.has(msg.tab.id)) {
+  //     completedTabs.add(msg.tab.id);
+  //     // only THEN send message
+  // }
     console.log("in content.js start observing")
     scrapeJobInfoEarly(user_id);
     attachObserverOnce();
