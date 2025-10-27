@@ -47,11 +47,7 @@ export async function addUsers<T>
   try {
     const res = await fetch(BASE + path, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body)
-
+      body
     })
 
     return { ok: true, data: await res.json() as T };

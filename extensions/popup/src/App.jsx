@@ -115,7 +115,7 @@ export default function App() {
 
       const formData = new FormData();
       formData.append("useruuid", newId);
-      formData.append("userEmail", userEmail);
+      formData.append("userEmail",useFrEmail);
       formData.append("UserResume", file);
 
       logUsers(formData);
@@ -123,15 +123,15 @@ export default function App() {
     });
   };
 
-  // const handleSendEmail = () => {
-  //   if (!selectedEmail) return;
-  //   chrome.runtime.sendMessage({
-  //     action: "send_gmail",
-  //     to: "jadepiper34@gmail.com",
-  //     subject: selectedEmail.emailSubject,
-  //     body: selectedEmail.emailText,
-  //   });
-  // };
+  const handleSendEmail = () => {
+    if (!selectedEmail) return;
+    chrome.runtime.sendMessage({
+      action: "send_gmail",
+      to: "jadepiper34@gmail.com",
+      subject: selectedEmail.emailSubject,
+      body: selectedEmail.emailText,
+    });
+  };
 
   const handlePaste = () => {
     if (!selectedEmail) return;
@@ -173,7 +173,10 @@ export default function App() {
               >
                 <PawPrint size={28} />
               </button>
+              <button>
               <Sparkles size={28} className="ml-auto opacity-60" />
+              </button>
+            
             </div>
 
             {/* mailbox links */}

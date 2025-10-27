@@ -7,6 +7,7 @@ export function attachObserverOnce() {
       if (sent) return; 
       const txt = document.body.innerText.toLowerCase();
         console.log(txt);
+        console.log("helloooow");
       if (!sent &&
           (txt.includes("application submitted")  ||
            txt.includes("thank you for applying") ||
@@ -18,7 +19,7 @@ export function attachObserverOnce() {
               console.log('inside1')
         sent = true;
         obs.disconnect();
-  
+          console.log("in obeservance?");
         chrome.storage.local.get(["pendingJob"], ({ pendingJob }) => {
           if (pendingJob) {
             chrome.runtime.sendMessage({ action: ACTION.CONNECTION.APPLY_BUTTON_CLICKED, job: pendingJob });

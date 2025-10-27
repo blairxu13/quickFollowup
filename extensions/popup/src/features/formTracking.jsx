@@ -11,7 +11,7 @@ async function fetchApplications(userId) {
 
 export default function Form() {
   const [userId, setUserId] = useState(null);
-  const [show, setShow] = useState(false); // <-- toggle
+  const [show, setShow] = useState(true); // <-- toggle
 
   useEffect(() => {
     chrome.storage.local.get(["user_id"], (r) => setUserId(r.user_id ?? null));
@@ -26,7 +26,7 @@ export default function Form() {
 
   return (
     <div>
-      <Building2 onClick={() => setShow((s) => !s)} />
+   
 
       {show && (
         <table>
