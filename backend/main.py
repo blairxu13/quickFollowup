@@ -17,14 +17,8 @@ url = os.getenv("SUPABASE_URL")
 key = os.getenv("SUPABASE_KEY")
 supabase = create_client(url, key)
 
-print("✅ ENV DEBUG — Supabase URL:", os.getenv("SUPABASE_URL"))
-print("✅ ENV DEBUG — Key length:", len(os.getenv("OPENAI_SK") or "❌ NOT FOUND"))
-print("✅ ENV DEBUG — Key length:", len(os.getenv("SUPABASE_KEY") or ""))
-
 openai_key = os.getenv("OPENAI_SK")
 llm = ChatOpenAI(model="gpt-4o", temperature=0.7, openai_api_key=openai_key)
-
-print("✅ ENV DEBUG — OpenAI Key prefix:", openai_key[:10] if openai_key else "❌ OpenAI Key not loaded")
 
 
 class JobPost(BaseModel):
@@ -55,7 +49,6 @@ app.add_middleware(
 
 
 async def process_job_added(user_id: str, job_title: str, jd: str):
-    print("🔔 Trigger received (internal):", user_id, job_title)
     user = supabase.table("users").select("userResume").eq("useruuid", user_id).single().execute().data
     resume_path = user["userResume"]
     resume_file = supabase.storage.from_("resumes").download(resume_path)
@@ -104,28 +97,19 @@ Resume:
         body = parsed["body"]
         return {"subject": subject, "body": body}
     except json.JSONDecodeError:
-        print("❌ Failed to parse LangChain output:", response.content)
         return {"subject": "Follow-up", "body": response.content}
 
 # track application should be able to
 
 @app.post("/track_application")
 async def track_application(job: JobPost):
-    print("📥 New job application:", job.dict())
-    #
-     
     try:
         email_object = await process_job_added(job.user_id, job.job_title, job.jd)
-        print("✅ Email generated")
-
         job_data = job.dict()
         job_data["emailSubject"] = email_object["subject"]
         job_data["emailText"] = email_object["body"]
-        
         supabase.table("job_posts").insert(job_data).execute()
-        #
     except Exception as e:
-        print("❌ Internal processing failed:", e)
         return JSONResponse(content={"error": str(e)}, status_code=500)
 
     
@@ -146,7 +130,6 @@ def get_application(user_id: str = Query(...)):
 @app.get("/get_unsent_emails")
 
 async def get_unsent_emails(user_id: str):
-    print("✅ get_unsent_emails")
     response = (
         supabase.table("job_posts")
         .select("*")
@@ -177,7 +160,6 @@ def adopt (body: dict = Body(...)):
 @app.get("/get_user_pet_info")
 
 async def get_user_pet_info(user_id: str):
-    print("✅ check if user has a pet or not")
     response = (
         supabase.table("petSystem")
         .select("*")  
@@ -192,9 +174,6 @@ async def add_users(
     userEmail: str = Form(...),
     UserResume: UploadFile = File(...)
 ):
-    print("📥 New user:", useruuid, userEmail)
-    print("📄 Resume filename:", UserResume.filename)
-
     resume_path = f"user_{useruuid}/{UserResume.filename}"
     file_bytes = await UserResume.read()
     supabase.storage.from_("resumes").upload(
@@ -237,16 +216,11 @@ def get_pet_image(user_id: str):
 @app.get("/static_pet")
    
 def list_pet_species():
-    print("rendering static pet info")
     res = supabase.table("pet_species").select(
         "pet_name, pet_description, pet_image"
     ).execute()
     rows = res.data or []
-    print(res)
-    print("res.data:", res.data)
     
-
-  
     out = []
     for r in rows:
         key = r["pet_image"]
