@@ -37,7 +37,7 @@
     ]
   },
   "background": {
-    "service_worker": "assets/background-C_5P5FbG.js",
+    "service_worker": "assets/background-isdjzk-4.js",
     "type": "module"
   }
 }

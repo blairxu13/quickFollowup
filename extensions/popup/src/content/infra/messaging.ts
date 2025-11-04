@@ -9,44 +9,29 @@ chrome.storage.local.set({ completedTabs: Array.from(completedTabs) });
 
 chrome.storage.local.get("user_id", (result) => {
   user_id = result.user_id;
+  console.log("👤 User ID loaded:", user_id);
 })
 chrome.runtime.sendMessage({ action: 'READY' });
-console.log("in content.js");
-chrome.runtime.onMessage.addListener((msg) => {
+
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+
   //connection between background and content
   if (msg.action == ACTION.CONNECTION.START_OBSERVING) {
-
-    console.log("in content.js start observing")
+  
     scrapeJobInfoEarly(user_id);
+ 
     attachObserverOnce();
 
 
   }  else if (msg.action == ACTION.RECRUITER.READY_TO_CONNECT) {
     console.log("📥 start prefilling _ready to connect");
 
+  } else {
+    console.log("⚠️ Unknown message action:", msg.action);
   }
   return undefined; 
 
 });
-
-// if (
-//   window.location.hostname === "www.google.com" &&
-//   window.location.pathname === "/search"
-//   //needs to add more condition here
-// ) {
-//   chrome.storage.local.get(["shouldRunExtractor", "draftSubject", "draftBody"], (res) => {
-//     if (res.shouldRunExtractor && res.draftSubject && res.draftBody) {
-//       console.log("🟢 Trigger conditions met. Extracting...");
-//       chrome.storage.local.remove("shouldRunExtractor");
-//       //callback always fires no matter what but this part will be silently skipped if condition is not met
-//        console.log("i am in the content.js after the fetch links");
-//       setTimeout(() => {
-//         extractLinkedInLinks();
-//         //res.draftSubject, res.draftBody
-//       }, 2000);
-//     }
-//   });
-// }
 
 
 

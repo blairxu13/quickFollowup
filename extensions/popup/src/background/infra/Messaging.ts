@@ -5,9 +5,11 @@ import { jsonPost } from './apiClient';
 import { emailList } from './app';
 import { unsetMarker } from '@tanstack/react-query';
 
-export const completedTabs = new Set();
+// WHY: Track completed tabs by URL, not just tabId
+// - Tab IDs can be reused, and same tab can load different URLs
+// - We want to scrape each unique URL, even if it's the same tab
+export const completedTabs = new Map<number, string>(); // Map<tabId, url>
 let allowClose = false;
-chrome.storage.local.set({ completedTabs: Array.from(completedTabs) });
 
 console.log("background alive:", new Date().toISOString());
 let sentOnce = true;
@@ -19,20 +21,50 @@ interface generatedFollowUp {
 }
 
 
-console.log("1️⃣ background start fetchReadableLinks");
-chrome.runtime.onMessage.addListener((msg) => {
-  console.log("2️⃣ background got message:", msg.action);
-  return undefined;
-});
-chrome.tabs.onRemoved.addListener((tabId, info) => {
-  console.log("3️⃣ tab closed:", tabId, info);
-});
 
+// WHY: This listener handles various actions including START_TRACKING
+// Make sure this is registered BEFORE trackingTabs() sets up its own listener
 chrome.runtime.onMessage.addListener((msg, sender) => {
+
+  if (msg.action === 'READY') {
+    console.log("✅ READY message received in Messaging.ts");
+    
+    const tabId = sender.tab?.id;
+    const tabUrl = sender.tab?.url;
+    
+    // Ensure tracking is initialized (it might not be if user hasn't opened popup yet)
+    if (!trackingRegistered) {
+      console.log("⚠️ Tracking not initialized yet, initializing now from READY message");
+      startTrackingOnce();
+      // WHY: After initializing, wait a moment for handleContentReady to register
+      // Then handle it ourselves as fallback
+      setTimeout(() => {
+        if (tabId && tabUrl) {
+          const previousUrl = completedTabs.get(tabId);
+          if (previousUrl !== tabUrl) {
+            console.log(`✅ Fallback: Sending START_OBSERVING to tab ${tabId} for URL: ${tabUrl}`);
+            try {
+              chrome.tabs.sendMessage(tabId, { action: ACTION.CONNECTION.START_OBSERVING });
+              completedTabs.set(tabId, tabUrl);
+              console.log('✅ START_OBSERVING sent successfully (fallback)');
+            } catch (error) {
+              console.error('❌ Error sending START_OBSERVING (fallback):', error);
+            }
+          }
+        }
+      }, 100);
+    }
+    
+    // WHY: Let handleContentReady in checkjobsites.ts handle the READY message if tracking is already registered
+    // - It has better logic for checking URL changes
+    // - Return undefined to let other listeners process it
+    return undefined;
+  }
+  
   if (msg.action == ACTION.CONNECTION.APPLY_BUTTON_CLICKED) {
     console.log("after button clicked");
-    if (sender.tab?.id) {
-      completedTabs.add(sender.tab.id);
+    if (sender.tab?.id && sender.tab?.url) {
+      completedTabs.set(sender.tab.id, sender.tab.url);
     }
 
     chrome.storage.local.get(["user_id"], async (result) => {
@@ -43,19 +75,44 @@ chrome.runtime.onMessage.addListener((msg, sender) => {
         isSent: false,
       };
       try {
-        const list = await emailList(job, result.user_id);
-        console.log("✅ got list", list);
-        chrome.storage.local.set({ emailList: list }, () => {
-          console.log("hello america good bye!");
-          chrome.runtime.sendMessage({ action: ACTION.RENDER.EMAIL_FETCHED });
-          console.log("hello america good bye!slay");
-        });
+        const emailListResponse = await emailList(job, result.user_id);
+        console.log("✅ got email list response", emailListResponse);
+        
+        // WHY: emailList returns APIresult, need to extract data
+        if (emailListResponse && emailListResponse.ok) {
+          const emails = emailListResponse.data || [];
+          console.log("✅ Extracted emails:", emails);
+          
+          // Store in chrome.storage for persistence
+          chrome.storage.local.set({ emailList: emails }, () => {
+            console.log("✅ Email list stored in chrome.storage");
+          });
+          
+          // Send message to frontend with the email list
+          chrome.runtime.sendMessage({ 
+            action: ACTION.RENDER.EMAIL_FETCHED,
+            list: emails 
+          });
+          console.log("✅ EMAIL_FETCHED message sent with list");
+        } else {
+          console.error("❌ emailList failed:", emailListResponse?.error || "Unknown error");
+          // Still send empty list so UI doesn't break
+          chrome.runtime.sendMessage({ 
+            action: ACTION.RENDER.EMAIL_FETCHED,
+            list: [] 
+          });
+        }
       } catch (err) {
-        console.error("❌ emailList failed", err);
+        console.error("❌ emailList exception:", err);
+        // Send empty list on error
+        chrome.runtime.sendMessage({ 
+          action: ACTION.RENDER.EMAIL_FETCHED,
+          list: [] 
+        });
       }
     });
   } else if (msg.action == ACTION.CONNECTION.START_TRACKING) {
-    console.log("tracking tabs initialized by action");
+    console.log("✅ START_TRACKING action received, initializing tracking");
     startTrackingOnce();
   } else if (msg.action == ACTION.RECRUITER.START_PASTING) {
     fetchReadableLinks(msg.company, msg.subject, msg.body);
@@ -67,22 +124,39 @@ chrome.runtime.onMessage.addListener((msg, sender) => {
 
 
 function startTrackingOnce() {
-  if (trackingRegistered) return;
+  if (trackingRegistered) {
+
+    return;
+  }
   trackingRegistered = true;
-  console.log(" registering trackingTabs listener once");
+
   trackingTabs();
 }
 
 
 chrome.runtime.onInstalled.addListener(() => {
+  console.log("🔧 Extension installed/reloaded");
   chrome.storage.local.get(["isTracking"], (result) => {
-    if (result.isTracking) startTrackingOnce();
+    console.log("🔍 isTracking value:", result.isTracking);
+    if (result.isTracking) {
+  
+      startTrackingOnce();
+    } else {
+  
+    }
   });
 });
 
 chrome.runtime.onStartup.addListener(() => {
+  console.log("🚀 Extension startup");
   chrome.storage.local.get(["isTracking"], (result) => {
-    if (result.isTracking) startTrackingOnce();
+    console.log("🔍 isTracking value:", result.isTracking);
+    if (result.isTracking) {
+      console.log("✅ Starting tracking on startup");
+      startTrackingOnce();
+    } else {
+      console.log("⏭️ Tracking not enabled, skipping");
+    }
   });
 });
 
