@@ -2,12 +2,7 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Building2 } from "lucide-react";
-
-async function fetchApplications(userId) {
-  const res = await fetch(`http://localhost:8000/get_applications?user_id=${encodeURIComponent(userId)}`);
-  if (!res.ok) throw new Error("fetch failed");
-  return res.json();
-}
+import { getApplications } from "../background/infra/helper";
 
 export default function Form() {
   const [userId, setUserId] = useState(null);
@@ -19,7 +14,14 @@ export default function Form() {
 
   const { data: apps } = useQuery({
     queryKey: ["applications", userId],
-    queryFn: () => fetchApplications(userId),
+    queryFn: async () => {
+      const result = await getApplications(userId);
+      if (result.ok) {
+        return result.data;
+      } else {
+        throw new Error(result.error.message);
+      }
+    },
     enabled: !!userId,
     staleTime: 30_000,
   });

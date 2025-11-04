@@ -59,10 +59,7 @@ export default function App() {
 
       // define an inner async function
       async function fetchEmails() {
-        console.log("📡 fetching unsent emails for", result.user_id);
         const res = await getUnsentEmailsList(result.user_id);
-        console.log("✅ fetched result", res);
-
         if (res.ok) setEmailList(res.data);
       }
 
@@ -71,25 +68,19 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    console.log("useeffect 1")
     chrome.storage.local.get(["user_id", "isTracking"], (result) => {
-      console.log("useeffect 1.1")
       if (!result.user_id) return;
-      console.log("useeffect 1.2")
       setUserId(result.user_id);
       setIsTracking(result.isTracking || false);
-      console.log("useeffect 1.3")
       if (!result.isTracking) {
         chrome.storage.local.set({ isTracking: true }, () => { });
       }
-      console.log("useeffect 1.4")
       chrome.runtime.sendMessage({ action: ACTION.CONNECTION.START_TRACKING });
-      console.log("useeffect 2")
     });
 
     chrome.runtime.onMessage.addListener((msg) => {
       if (msg.action === ACTION.RENDER.EMAIL_GENERATED) {
-        console.log(" Email received:", msg.email);
+        // Email generated
       }
       if (msg.action === ACTION.RENDER.EMAIL_FETCHED) {
         const list = msg.list || []; // default to empty
@@ -103,7 +94,6 @@ export default function App() {
     const useFrEmail = emailInputRef.current?.value || "";
     const file = fileRef.current?.files[0];
     if (!file) {
-      console.error("No file selected!");
       return;
     }
     const newId = crypto.randomUUID();
@@ -123,15 +113,15 @@ export default function App() {
     });
   };
 
-  const handleSendEmail = () => {
-    if (!selectedEmail) return;
-    chrome.runtime.sendMessage({
-      action: "send_gmail",
-      to: "jadepiper34@gmail.com",
-      subject: selectedEmail.emailSubject,
-      body: selectedEmail.emailText,
-    });
-  };
+  // const handleSendEmail = () => {
+  //   if (!selectedEmail) return;
+  //   chrome.runtime.sendMessage({
+  //     action: "send_gmail",
+  //     to: "jadepiper34@gmail.com",
+  //     subject: selectedEmail.emailSubject,
+  //     body: selectedEmail.emailText,
+  //   });
+  // };
 
   const handlePaste = () => {
     if (!selectedEmail) return;
@@ -258,15 +248,15 @@ export default function App() {
                     <div>
                       <h2 className="text-xl font-bold mb-2">{e.emailSubject}</h2>
                       <p className="whitespace-pre-wrap">{e.emailText}</p>
-                      <button
+                      {/* <button
                         onClick={handleSendEmail}
                         className="mt-4 px-4 py-2 bg-blue-500 text-black rounded"
                       >
                         Send Email
-                      </button>
+                      </button> */}
                       <button
                         onClick={handlePaste}
-                        className="mt-4 ml-2 px-4 py-2 bg-blue-500 text-black rounded"
+                        className="mt-4 ml-2 px-4 py-2 bg-grey-500 text-black rounded"
                       >
                         PASTE
                       </button>

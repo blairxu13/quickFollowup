@@ -70,7 +70,6 @@ export function scanUntilFirstDMable(links: string[]) {
             const onLoad = (updatedId: number, info: { status?: string }) => {
                 if (updatedId !== tabId || info.status !== "complete") return;
                 chrome.tabs.onUpdated.removeListener(onLoad);
-                console.log(updatedId);
           
                 chrome.scripting.executeScript({
                     target: { tabId },
@@ -84,9 +83,7 @@ export function scanUntilFirstDMable(links: string[]) {
                             // filter for the one that actually has an <svg> inside it
                             const btn = btns.find(b => b.querySelector("svg"));
 
-                            console.log("🕵️ Checking Message buttons:", btns.length);
                             if (!btn) {
-                         
                                 return;
                             }
 

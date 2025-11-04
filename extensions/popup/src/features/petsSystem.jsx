@@ -24,7 +24,6 @@ export default function Petsystem() {
     );
     if (!res.ok) throw new Error("fetch failed");
     const data = await res.json();
-    console.log("data", data);
     if (!data || data.length === 0) {
       await checkUserPetInfo();            // no pet → show adoption grid
       setStoreInfo([]);                    // ensure store hidden
@@ -38,13 +37,11 @@ export default function Petsystem() {
 
   async function adoptPet(pet) {
     if (!userId) return;
-    console.log("pet", pet)
     // prefer using a stable ID if you have it (pet.pet_uuid). If not, send name and resolve server-side.
     const body = {
       user_id: userId,
       pet_name: pet.name  // if you only have pet.name, send that and resolve on backend
     };
-    console.log("hitting the adopt button")
     const res = await fetch("http://localhost:8000/adopt", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -52,7 +49,6 @@ export default function Petsystem() {
     });
 
     if (!res.ok) {
-      console.error("adopt failed", await res.text());
       return;
     }
     //launch the app

@@ -9,7 +9,6 @@ chrome.storage.local.set({ completedTabs: Array.from(completedTabs) });
 
 chrome.storage.local.get("user_id", (result) => {
   user_id = result.user_id;
-  console.log("👤 User ID loaded:", user_id);
 })
 chrome.runtime.sendMessage({ action: 'READY' });
 
@@ -24,10 +23,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
 
   }  else if (msg.action == ACTION.RECRUITER.READY_TO_CONNECT) {
-    console.log("📥 start prefilling _ready to connect");
-
-  } else {
-    console.log("⚠️ Unknown message action:", msg.action);
+    // Handle ready to connect
   }
   return undefined; 
 

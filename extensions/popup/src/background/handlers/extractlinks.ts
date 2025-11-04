@@ -1,6 +1,5 @@
 // NO imports here — this runs in the page context
 export function extractLinkedInLinks() {
-  console.log("extract links from first page of Google");
   const anchors = Array.from(document.querySelectorAll('a'));
   const linkedinLinks = anchors
     .map(a => (a as HTMLAnchorElement).href)
@@ -17,6 +16,5 @@ export function extractLinkedInLinks() {
     linkedinLinks.map(link => link.split("?")[0].split("&")[0])
   ));
 
-  console.log("✅ Extracted:", cleanedLinks);
   return cleanedLinks; // <- return serializable data
 }

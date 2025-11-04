@@ -10,7 +10,6 @@ export function attachObserverOnce() {
       const currentUrl = window.location.href;
       if (currentUrl !== initialUrl) {
         hasUrlChanged = true;
-        console.log("🔄 URL changed from listing to:", currentUrl);
       }
       return hasUrlChanged;
     };
@@ -73,31 +72,20 @@ export function attachObserverOnce() {
       );
       
       if (matchedPhrase) {
-        console.log(`✅ Found confirmation phrase: "${matchedPhrase}"`);
-        console.log('📍 URL changed:', hasUrlChanged);
-        console.log('📍 Is confirmation page:', isConfirmationPage());
-        console.log('📝 Full page text sample:', combinedText.substring(0, 200));
-        
         sent = true;
         if (checkTimeout) clearTimeout(checkTimeout);
         obs.disconnect();
         
-   
         if (originalPushState) history.pushState = originalPushState;
         if (originalReplaceState) history.replaceState = originalReplaceState;
         
         chrome.storage.local.get(["pendingJob"], ({ pendingJob }) => {
           if (pendingJob) {
-            console.log("📤 Sending job to background:", pendingJob);
             chrome.runtime.sendMessage({ 
               action: ACTION.CONNECTION.APPLY_BUTTON_CLICKED, 
               job: pendingJob 
             });
             chrome.storage.local.remove("pendingJob");
-            console.log("✅ Application confirmed → sent job to background");
-          } else {
-            // WHY: Warn if job data is missing - helps debug if scraping failed
-            console.warn("⚠️ No pendingJob found in storage - application may have been detected but job data missing");
           }
         });
       }
@@ -148,14 +136,9 @@ export function attachObserverOnce() {
       checkUrlChange();
       setTimeout(checkForConfirmation, 100);
     });
-    
-   
     if (isConfirmationPage()) {
-      console.log("✅ Already on confirmation page, checking immediately");
       checkForConfirmation();
     } else {
-      console.log("⏳ On job listing page, waiting for URL change or confirmation");
-      // Check URL change only
       checkUrlChange();
     }
     
@@ -173,9 +156,6 @@ export function attachObserverOnce() {
     
 
     setTimeout(() => {
-      if (!sent) {
-        console.warn("⏱️ Observer timeout after 30s - no confirmation detected");
-      }
       obs.disconnect();
       clearInterval(periodicCheck);
       if (checkTimeout) clearTimeout(checkTimeout);

@@ -26,13 +26,10 @@ export function fetchReadableLinks(company: string, subject: string, body: strin
         })
         .then(([inj]) => {
           const links = Array.isArray(inj?.result) ? inj.result : [];
-          console.log("links are", links)
           scanUntilFirstDMable(links);
-          // chrome.runtime.sendMessage({ action: ACTION.RECRUITER.RECRUITER_LINKS_FOUND, links});
           chrome.tabs.remove(currentTabId); 
         })
         .catch((err) => {
-          console.warn("extract failed:", err);
           chrome.tabs.remove(currentTabId); // don't leave zombie tabs
         });
       };
