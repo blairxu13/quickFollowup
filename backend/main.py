@@ -210,7 +210,9 @@ def get_pet_image(user_id: str):
     return ans
 
 
-
+@app.get("/")
+def root():
+    return {"ok": True, "message": "QuickFollowup backend is alive!"}
 
 
 @app.get("/static_pet")
