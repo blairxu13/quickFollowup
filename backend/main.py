@@ -37,6 +37,16 @@ class User(BaseModel):
     userEmail: str
 
 
+class ConnectionPayload(BaseModel):
+    user_id: str
+    user_school: str
+    user_major: Optional[str] = None
+    user_goal: Optional[str] = None
+    user_month_goal: Optional[str] = None
+    user_companies_goal: Optional[str] = None
+    user_email: Optional[str] = None
+
+
 app = FastAPI()
 
 app.add_middleware(
@@ -140,6 +150,13 @@ async def get_unsent_emails(user_id: str):
     )
     return response.data
 
+@app.post("/user_sign_up_for_connections")
+async def user_sign_up_for_connections(payload: ConnectionPayload):
+    try:
+        supabase.table("connections").insert(payload.dict()).execute()
+        return {"ok": True}
+    except Exception as e:
+        return JSONResponse(content={"error": str(e)}, status_code=500)
 
 
 

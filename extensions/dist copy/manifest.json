@@ -37,7 +37,7 @@
     ]
   },
   "background": {
-    "service_worker": "assets/background-BkVs52s2.js",
+    "service_worker": "assets/background-CtlJyvDW.js",
     "type": "module"
   }
 }

@@ -1,4 +1,3 @@
-import { Bone } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function Petsystem() {
@@ -6,11 +5,6 @@ export default function Petsystem() {
   const [petInfo, setPetInfo] = useState([]);   // array to map when user has no pet
   const [storeInfo, setStoreInfo] = useState([]); // simple placeholder when user has a pet
   const [expandedId, setExpandedId] = useState(null); // toggle description per card
-  const [open, setOpen] = useState(false);       // toggle Bone drawer
-
-  useEffect(() => {
-    chrome.storage.local.get(["user_id"], (r) => setUserId(r.user_id ?? null));
-  }, []);
 
   const checkUserPetInfo = async () => {
     const res = await fetch("http://localhost:8000/static_pet");
@@ -32,6 +26,16 @@ export default function Petsystem() {
       setStoreInfo(["food1", "food2"]);    // has pets → show store
     }
   }
+
+  useEffect(() => {
+    chrome.storage.local.get(["user_id"], (r) => {
+      const uid = r.user_id ?? null;
+      setUserId(uid);
+      if (uid) {
+        fetchApplications(uid);
+      }
+    });
+  }, []);
 
 
 
@@ -67,23 +71,6 @@ export default function Petsystem() {
 
   return (
     <div className="p-3">
-      <Bone
-        className="cursor-pointer"
-        onClick={async () => {
-          if (!userId) return;
-          if (!open) {
-            await fetchApplications(userId); // open & fetch
-            setOpen(true);
-          } else {
-            // close & clear
-            setPetInfo([]);
-            setStoreInfo([]);
-            setExpandedId(null);
-            setOpen(false);
-          }
-        }}
-      />
-
       {/* Adoption grid (no pet) */}
       {petInfo.length > 0 && (
         <div className="mt-4 flex gap-3 overflow-x-auto">

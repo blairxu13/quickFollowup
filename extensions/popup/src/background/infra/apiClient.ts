@@ -1,7 +1,7 @@
 export type APIok<T> = { ok: true; data: T };
 export type APIfail = { ok: false; error: { message: string } };
 export type APIresult<T> = APIok<T> | APIfail;
-const BASE = 'http://localhost:8000/';
+const BASE = 'https://quickfollowup.onrender.com/';
 
 
 interface userBody {

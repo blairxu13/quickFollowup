@@ -1,8 +1,9 @@
 import { useEffect, useState, useRef } from "react";
 import Form from './features/formTracking';
 import Petsystem from './features/petsSystem';
+import Connection from './features/connection';
 import { getUnsentEmailsList, logUsers } from './background/infra/helper'
-import { ClipboardList, PawPrint, Sparkles } from "lucide-react";
+import { ClipboardList, PawPrint, Sparkles, UsersRound } from "lucide-react";
 import { ACTION } from './shared/types'
 
 export default function App() {
@@ -146,7 +147,7 @@ export default function App() {
           {/* Left Sidebar — Gmail-like */}
           <div className="w-1/4 h-full border-r border-gray-300 overflow-hidden flex flex-col">
             {/* top icon row (click → opens a TAB on the right) */}
-            <div className="flex items-center gap-4 p-2 text-gray-700">
+            <div className="flex items-center gap-4 p-2 pr-3 text-gray-700">
               <button
                 type="button"
                 title="Tracking Form"
@@ -155,18 +156,28 @@ export default function App() {
               >
                 <ClipboardList size={28} />
               </button>
-              <button
+              {/* <button
                 type="button"
                 title="Pet System"
                 onClick={() => openToolTab('pet', 'Pet System', <Petsystem />)}
                 className="p-1 rounded hover:bg-gray-100"
               >
-                <PawPrint size={28} />
+                <PawPrint size={28} className="opacity-60" />
+              </button> */}
+              <button
+                type="button"
+                className="p-1 rounded hover:bg-gray-100"
+              >
+                <Sparkles size={28} className="opacity-60" />
               </button>
-              <button>
-              <Sparkles size={28} className="ml-auto opacity-60" />
+              <button
+                type="button"
+                className="p-1 rounded hover:bg-gray-100"
+                 title="Connection"
+                 onClick={() => openToolTab('connect', 'Connection', <Connection />)}
+              >
+                <UsersRound size={28} className="opacity-60" />
               </button>
-            
             </div>
 
             {/* mailbox links */}

@@ -12,5 +12,8 @@ export async function getApplications(userId: string) {
 export async function logUsers(body: any) {
     return addUsers<unknown[]>(body, `add_users`);
 }
+export async function submitConnectionPreferences(payload: Record<string, any>) {
+    return jsonPost<unknown, typeof payload>(`user_sign_up_for_connections`, payload);
+}
 
 //helper functions for a bunch of promises
