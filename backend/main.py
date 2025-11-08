@@ -41,7 +41,6 @@ class ConnectionPayload(BaseModel):
     user_id: str
     user_school: str
     user_major: Optional[str] = None
-    user_goal: Optional[str] = None
     user_month_goal: Optional[str] = None
     user_companies_goal: Optional[str] = None
     user_email: Optional[str] = None

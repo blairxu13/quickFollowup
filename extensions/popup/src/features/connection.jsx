@@ -52,17 +52,27 @@ export default function Connection() {
       .map((entry) => entry.trim())
       .filter(Boolean);
 
-    const combinedCompanies = showCompanyField
-      ? [...companies, ...customEntries]
-      : [];
+    const goalTextMap = {
+      "1": "i want to find a internship",
+      "2": "full time job",
+      "3": "just connection for now",
+    };
+
+    const combinedGoals = [];
+    if (goal) {
+      combinedGoals.push(goalTextMap[goal] || goal);
+    }
+    if (showCompanyField) {
+      combinedGoals.push(...companies);
+    }
+    combinedGoals.push(...customEntries);
 
     const payload = {
       user_id: userId,
       user_school: school,
       user_major: major,
-      user_goal: goal,
       user_month_goal: timePerDay,
-      user_companies_goal: combinedCompanies.join(", "),
+      user_companies_goal: combinedGoals.join(", "),
       user_email: email,
     };
 
@@ -70,6 +80,13 @@ export default function Connection() {
       const result = await submitConnectionPreferences(payload);
       if (result && result.ok) {
         setStatus({ type: "success", message: "Preferences saved!" });
+        setSchool("");
+        setMajor("");
+        setGoal("");
+        setCompanies([]);
+        setCustomCompany("");
+        setTimePerDay("");
+        setEmail("");
       } else {
         setStatus({ type: "error", message: result?.error?.message ?? "Failed to save." });
       }
