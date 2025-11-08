@@ -12,6 +12,9 @@ import fitz
 from langchain_openai import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
 from typing import Optional
+import requests
+
+N8N_WEBHOOK_URL = "https://networkingdailydigest.app.n8n.cloud/webhook-test/c6eba799-e1aa-4770-8ef9-441ac1d1e9a2"
 load_dotenv()
 url = os.getenv("SUPABASE_URL")
 key = os.getenv("SUPABASE_KEY")
@@ -153,6 +156,16 @@ async def get_unsent_emails(user_id: str):
 async def user_sign_up_for_connections(payload: ConnectionPayload):
     try:
         supabase.table("connections").insert(payload.dict()).execute()
+
+        try:
+            requests.post(
+                N8N_WEBHOOK_URL,
+                json=payload.dict(),
+                timeout=5,
+            )
+        except Exception:
+            pass
+
         return {"ok": True}
     except Exception as e:
         return JSONResponse(content={"error": str(e)}, status_code=500)
