@@ -81,11 +81,20 @@ export function attachObserverOnce() {
         
         chrome.storage.local.get(["pendingJob"], ({ pendingJob }) => {
           if (pendingJob) {
+            console.log("[observer] confirmation detected -> sending job", pendingJob);
             chrome.runtime.sendMessage({ 
               action: ACTION.CONNECTION.APPLY_BUTTON_CLICKED, 
               job: pendingJob 
+            }, () => {
+              if (chrome.runtime.lastError) {
+                console.warn("[observer] sendMessage error", chrome.runtime.lastError);
+              }
             });
-            chrome.storage.local.remove("pendingJob");
+            chrome.storage.local.remove("pendingJob", () => {
+              console.log("[observer] pendingJob cleared");
+            });
+          } else {
+            console.log("[observer] confirmation detected but no pendingJob");
           }
         });
       }

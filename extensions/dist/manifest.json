@@ -7,10 +7,7 @@
     "storage",
     "tabs",
     "activeTab",
-    "scripting",
-    "identity",
-    "webNavigation",
-    "alarms"
+    "scripting"
   ],
   "description": "Chrome extension for job seekers.",
   "action": {
@@ -37,7 +34,7 @@
     ]
   },
   "background": {
-    "service_worker": "assets/background-BkVs52s2.js",
+    "service_worker": "assets/background-D4hcwzgD.js",
     "type": "module"
   }
 }

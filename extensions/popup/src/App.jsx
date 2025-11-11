@@ -55,17 +55,44 @@ export default function App() {
   //need to add how to deal with the list here?
 
   useEffect(() => {
-    chrome.storage.local.get("user_id", (result) => {
-      if (!result.user_id) return;
+    let currentUserId = null;
 
-      // define an inner async function
-      async function fetchEmails() {
-        const res = await getUnsentEmailsList(result.user_id);
+    function fetchEmails(userId) {
+      getUnsentEmailsList(userId).then((res) => {
         if (res.ok) setEmailList(res.data);
-      }
+      });
+    }
 
-      fetchEmails(); // call it
+    chrome.storage.local.get(["user_id"], (result) => {
+      if (!result.user_id) return;
+      currentUserId = result.user_id;
+      fetchEmails(result.user_id);
     });
+
+    function handleVisibility() {
+      if (document.visibilityState === "visible" && currentUserId) {
+        fetchEmails(currentUserId);
+      }
+    }
+
+    function handleStorage(changes, area) {
+      if (area !== "local") return;
+      if (changes.emailList) {
+        const updated = changes.emailList.newValue ?? [];
+        setEmailList(updated);
+      }
+      if (changes.user_id) {
+        currentUserId = changes.user_id.newValue ?? null;
+      }
+    }
+
+    document.addEventListener("visibilitychange", handleVisibility);
+    chrome.storage.onChanged.addListener(handleStorage);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibility);
+      chrome.storage.onChanged.removeListener(handleStorage);
+    };
   }, []);
 
   useEffect(() => {

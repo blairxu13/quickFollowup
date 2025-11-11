@@ -8,10 +8,7 @@
     "storage",
     "tabs",
     "activeTab",
-    "scripting",
-    "identity",
-    "webNavigation",
-    "alarms"
+    "scripting"
 
   ],
   "description": "Chrome extension for job seekers.",

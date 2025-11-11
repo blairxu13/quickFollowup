@@ -56,25 +56,32 @@ chrome.runtime.onMessage.addListener((msg, sender) => {
   }
   
   if (msg.action == ACTION.CONNECTION.APPLY_BUTTON_CLICKED) {
+    console.log("[background] APPLY_BUTTON_CLICKED", msg.job);
     if (sender.tab?.id && sender.tab?.url) {
       completedTabs.set(sender.tab.id, sender.tab.url);
     }
 
     chrome.storage.local.get(["user_id"], async (result) => {
+      console.log("[background] user_id from storage", result.user_id);
       const job = {
         ...msg.job,
         user_id: result.user_id,
         isSent: false,
       };
+      console.log("[background] job payload to emailList", job);
       try {
         const emailListResponse = await emailList(job, result.user_id);
+        console.log("[background] emailList response", emailListResponse);
         
         // WHY: emailList returns APIresult, need to extract data
         if (emailListResponse && emailListResponse.ok) {
           const emails = emailListResponse.data || [];
+          console.log("[background] emailList data", emails);
           
           // Store in chrome.storage for persistence
-          chrome.storage.local.set({ emailList: emails }, () => {});
+          chrome.storage.local.set({ emailList: emails }, () => {
+            console.log("[background] emailList stored");
+          });
           
           // Send message to frontend with the email list
           chrome.runtime.sendMessage({ 
@@ -82,6 +89,7 @@ chrome.runtime.onMessage.addListener((msg, sender) => {
             list: emails 
           });
         } else {
+          console.warn("[background] emailList error result", emailListResponse?.error);
           // Still send empty list so UI doesn't break
           chrome.runtime.sendMessage({ 
             action: ACTION.RENDER.EMAIL_FETCHED,
@@ -89,6 +97,7 @@ chrome.runtime.onMessage.addListener((msg, sender) => {
           });
         }
       } catch (err) {
+        console.error("[background] emailList threw", err);
         // Send empty list on error
         chrome.runtime.sendMessage({ 
           action: ACTION.RENDER.EMAIL_FETCHED,

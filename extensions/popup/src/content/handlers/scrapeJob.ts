@@ -86,6 +86,69 @@ export function scrapeJobInfoEarly(user: any) {
         }
     }
 
+    if (site.includes("jobs.ashbyhq.com")) {
+        const cleanedParts = pathParts.filter(Boolean);
+        if (cleanedParts.length === 0) {
+            return;
+        }
+
+        const isApplicationView = cleanedParts[cleanedParts.length - 1] === "application";
+        const baseParts = isApplicationView ? cleanedParts.slice(0, -1) : cleanedParts;
+
+        if (baseParts.length === 0) {
+            return;
+        }
+
+        const companySlug = baseParts[0];
+        const jobBaseUrl = `${window.location.origin}/${baseParts.join("/")}`;
+
+        const extractFromDocument = (doc: Document) => {
+            const titleEl =
+                (doc.querySelector("h1.ashby-job-posting-heading") as HTMLElement | null) ??
+                (doc.querySelector('h1[class*="ashby-job-posting-heading"]') as HTMLElement | null);
+
+            const descEl =
+                (doc.querySelector('[class*="_descriptionText"]') as HTMLElement | null) ??
+                (doc.querySelector('[class*="ashby-job-posting"]') as HTMLElement | null);
+
+            const extractedTitle = titleEl?.innerText?.trim();
+            const extractedDescription = descEl?.innerText?.trim();
+
+            if (extractedTitle || extractedDescription) {
+                saveJobData({
+                    user_id: user,
+                    url: jobBaseUrl,
+                    job_title: extractedTitle,
+                    company: companySlug,
+                    jd: extractedDescription,
+                });
+            }
+        };
+
+        if (isApplicationView) {
+            fetch(jobBaseUrl, { credentials: "include" })
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch job page (${response.status})`);
+                    }
+                    return response.text();
+                })
+                .then((html) => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, "text/html");
+                    extractFromDocument(doc);
+                })
+                .catch(() => {
+                    // If fetch fails, attempt to scrape from the current document as a fallback
+                    extractFromDocument(document);
+                });
+        } else {
+            extractFromDocument(document);
+        }
+
+        return;
+    }
+
  //need to add jobs.lever.co, jd and application is in different sites
  //need to add ashbyhq, but jd and application is in different sites?
 }
