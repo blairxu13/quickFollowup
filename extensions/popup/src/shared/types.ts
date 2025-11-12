@@ -27,7 +27,9 @@ LINKEDLN:
 SIMPLIFY:
     "simplify.jobs",
 WORKDAY:  "myworkdayjobs.com",
-GREENHOUSE: "greenhouse.io"
+GREENHOUSE: "greenhouse.io",
+ASHBYHQ: "jobs.ashbyhq.com",
+LEVER: "jobs.lever.co"
 } as const;
 
 
