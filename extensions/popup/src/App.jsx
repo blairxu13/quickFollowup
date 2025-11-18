@@ -5,6 +5,8 @@ import Connection from './features/connection';
 import { getUnsentEmailsList, logUsers } from './background/infra/helper'
 import { ClipboardList, PawPrint, Sparkles, UsersRound } from "lucide-react";
 import { ACTION } from './shared/types'
+import catOpenEyes from './ui/cat_open_eyes.png';
+import catCloseEyes from './ui/cat_close_eyes.png';
 
 export default function App() {
   const [userId, setUserId] = useState(null);
@@ -19,6 +21,7 @@ export default function App() {
 
   const emailInputRef = useRef(null);
   const fileRef = useRef(null);
+  const [isSelectingFile, setIsSelectingFile] = useState(false);
 
 
   function openEmailTab(email) {
@@ -117,13 +120,43 @@ export default function App() {
     });
   }, []);
 
+  // Handle window focus to detect when file dialog closes (user cancels)
+  useEffect(() => {
+    if (!userId && isSelectingFile) {
+      const handleFocus = () => {
+        // Small delay to ensure onChange fires first if file was selected
+        setTimeout(() => {
+          if (isSelectingFile && !fileRef.current?.files?.[0]) {
+            setIsSelectingFile(false);
+          }
+        }, 100);
+      };
+
+      window.addEventListener('focus', handleFocus);
+      return () => window.removeEventListener('focus', handleFocus);
+    }
+  }, [userId, isSelectingFile]);
+
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
 
   const handleLogin = () => {
     const useFrEmail = emailInputRef.current?.value || "";
     const file = fileRef.current?.files[0];
-    if (!file) {
+    
+    if (!useFrEmail || !validateEmail(useFrEmail)) {
+      alert("Please enter a valid email address");
       return;
     }
+    
+    if (!file) {
+      alert("Please choose a file");
+      return;
+    }
+    
     const newId = crypto.randomUUID();
     setUserId(newId);
     setIsTracking(true);
@@ -133,7 +166,7 @@ export default function App() {
 
       const formData = new FormData();
       formData.append("useruuid", newId);
-      formData.append("userEmail",useFrEmail);
+      formData.append("userEmail", useFrEmail);
       formData.append("UserResume", file);
 
       logUsers(formData);
@@ -164,10 +197,42 @@ export default function App() {
   return (
     <div className="h-screen w-screen overflow-hidden font-sans">
       {!userId ? (
-        <div id="loginPage">
-          <input ref={fileRef} type="file" accept=".pdf,.doc,.docx" />
-          <input ref={emailInputRef} type="email" placeholder="Enter your email" />
-          <button type="button" onClick={handleLogin}>Log In</button>
+        <div id="loginPage" className="h-screen relative">
+          <div className="flex flex-col items-center justify-center h-screen gap-4" style={{ transform: 'translateY(-80px)' }}>
+            <h1 className="text-xl font-bold text-gray-900 mb-2">Your OneStop Networking tool</h1>
+            <div className="flex flex-col items-center gap-2">
+              <label className="text-sm text-gray-700">Email:</label>
+              <input 
+                ref={emailInputRef} 
+                type="email" 
+                placeholder="Enter your email" 
+                className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            <div className="flex flex-col items-center gap-2">
+              <label className="text-sm text-gray-700">Your Resume:</label>
+              <input 
+                ref={fileRef} 
+                type="file" 
+                accept=".pdf,.doc,.docx" 
+                onClick={() => setIsSelectingFile(true)}
+                onChange={() => setIsSelectingFile(false)}
+                className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            <button 
+              type="button" 
+              onClick={handleLogin}
+              className="px-4 py-1.5 bg-gray-100 text-gray-700 rounded-sm hover:bg-gray-200 focus:outline-none transition-colors text-sm font-normal border border-transparent hover:border-gray-300"
+            >
+              Log In
+            </button>
+          </div>
+          <img 
+            src={isSelectingFile ? catCloseEyes : catOpenEyes} 
+            alt="cat" 
+            className="absolute bottom-0 left-0 w-56 h-56 object-contain"
+          />
         </div>
       ) : (
         <div id="dashboard" className="flex h-full w-full min-w-0">
