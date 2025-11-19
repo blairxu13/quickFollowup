@@ -55,8 +55,7 @@ export default function App() {
       return next;
     });
   }
-  //need to add how to deal with the list here?
-
+  
   useEffect(() => {
     let currentUserId = null;
 
@@ -174,16 +173,6 @@ export default function App() {
     });
   };
 
-  // const handleSendEmail = () => {
-  //   if (!selectedEmail) return;
-  //   chrome.runtime.sendMessage({
-  //     action: "send_gmail",
-  //     to: "jadepiper34@gmail.com",
-  //     subject: selectedEmail.emailSubject,
-  //     body: selectedEmail.emailText,
-  //   });
-  // };
-
   const handlePaste = () => {
     if (!selectedEmail) return;
     chrome.runtime.sendMessage({
@@ -195,126 +184,156 @@ export default function App() {
   };
 
   return (
-    <div className="h-screen w-screen overflow-hidden font-sans">
+    <div className="h-screen w-screen overflow-hidden font-sans text-[#37352F] bg-white selection:bg-blue-100">
       {!userId ? (
-        <div id="loginPage" className="h-screen relative">
-          <div className="flex flex-col items-center justify-center h-screen gap-4" style={{ transform: 'translateY(-80px)' }}>
-            <h1 className="text-xl font-bold text-gray-900 mb-2">Your OneStop Networking tool</h1>
-            <div className="flex flex-col items-center gap-2">
-              <label className="text-sm text-gray-700">Email:</label>
-              <input 
-                ref={emailInputRef} 
-                type="email" 
-                placeholder="Enter your email" 
-                className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+        <div id="loginPage" className="h-screen relative bg-[#F7F7F5]">
+          <div className="flex flex-col items-center justify-center h-screen gap-6 z-10 relative" style={{ transform: 'translateY(-80px)' }}>
+            <div className="text-center space-y-2">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-white shadow-sm text-2xl mb-2">
+                💼
+              </div>
+              <h1 className="text-2xl font-semibold tracking-tight text-gray-900">Networking Tool</h1>
+              <p className="text-sm text-gray-500">Your all-in-one outreach assistant</p>
             </div>
-            <div className="flex flex-col items-center gap-2">
-              <label className="text-sm text-gray-700">Your Resume:</label>
-              <input 
-                ref={fileRef} 
-                type="file" 
-                accept=".pdf,.doc,.docx" 
-                onClick={() => setIsSelectingFile(true)}
-                onChange={() => setIsSelectingFile(false)}
-                className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+            
+            <div className="w-full max-w-xs space-y-4 bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Email</label>
+                <input 
+                  ref={emailInputRef} 
+                  type="email" 
+                  placeholder="name@example.com" 
+                  className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm"
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Resume</label>
+                <input 
+                  ref={fileRef} 
+                  type="file" 
+                  accept=".pdf,.doc,.docx" 
+                  onClick={() => setIsSelectingFile(true)}
+                  onChange={() => setIsSelectingFile(false)}
+                  className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm file:mr-4 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                />
+              </div>
+              <button 
+                type="button" 
+                onClick={handleLogin}
+                className="w-full py-2 bg-[#2F2F2F] hover:bg-black text-white rounded-md transition-colors text-sm font-medium shadow-sm mt-2"
+              >
+                Start Networking
+              </button>
             </div>
-            <button 
-              type="button" 
-              onClick={handleLogin}
-              className="px-4 py-1.5 bg-gray-100 text-gray-700 rounded-sm hover:bg-gray-200 focus:outline-none transition-colors text-sm font-normal border border-transparent hover:border-gray-300"
-            >
-              Log In
-            </button>
           </div>
           <img 
             src={isSelectingFile ? catCloseEyes : catOpenEyes} 
             alt="cat" 
-            className="absolute bottom-0 left-0 w-56 h-56 object-contain"
+            className="absolute bottom-0 left-0 w-56 h-56 object-contain z-0"
           />
         </div>
       ) : (
         <div id="dashboard" className="flex h-full w-full min-w-0">
-          {/* Left Sidebar — Gmail-like */}
-          <div className="w-1/4 h-full border-r border-gray-300 overflow-hidden flex flex-col">
-            {/* top icon row (click → opens a TAB on the right) */}
-            <div className="flex items-center gap-4 p-2 pr-3 text-gray-700">
-              <button
-                type="button"
-                title="Tracking Form"
-                onClick={() => openToolTab('tracking', 'Tracking Form', <Form />)}
-                className="p-1 rounded hover:bg-gray-100"
-              >
-                <ClipboardList size={28} />
-              </button>
-              {/* <button
-                type="button"
-                title="Pet System"
-                onClick={() => openToolTab('pet', 'Pet System', <Petsystem />)}
-                className="p-1 rounded hover:bg-gray-100"
-              >
-                <PawPrint size={28} className="opacity-60" />
-              </button> */}
-              <button
-                type="button"
-                className="p-1 rounded hover:bg-gray-100"
-              >
-                <Sparkles size={28} className="opacity-60" />
-              </button>
-              <button
-                type="button"
-                className="p-1 rounded hover:bg-gray-100"
-                 title="Connection"
-                 onClick={() => openToolTab('connect', 'Connection', <Connection />)}
-              >
-                <UsersRound size={28} className="opacity-60" />
-              </button>
+          {/* Left Sidebar — Notion-like Side Panel */}
+          <div className="w-1/4 min-w-[200px] h-full bg-[#F7F7F5] border-r border-[#E9E9E9] flex flex-col">
+            
+            {/* Top Tools Area */}
+            <div className="p-3">
+              <div className="text-xs font-semibold text-gray-400 px-2 mb-2 uppercase tracking-wider">Tools</div>
+              <div className="grid grid-cols-4 gap-2">
+                <button
+                  type="button"
+                  title="Tracking Form"
+                  onClick={() => openToolTab('tracking', 'Tracking Form', <Form />)}
+                  className="aspect-square flex items-center justify-center rounded-md bg-[#FFE2DD] text-[#D44C47] hover:opacity-80 transition-opacity"
+                >
+                  <ClipboardList size={20} />
+                </button>
+                {/* <button
+                  type="button"
+                  title="Pet System"
+                  onClick={() => openToolTab('pet', 'Pet System', <Petsystem />)}
+                  className="aspect-square flex items-center justify-center rounded-md bg-[#D3F5F7] text-[#2B9DAD] hover:opacity-80 transition-opacity"
+                >
+                  <PawPrint size={20} />
+                </button> */}
+                <button
+                  type="button"
+                  className="aspect-square flex items-center justify-center rounded-md bg-[#E8DEEE] text-[#9065B0] hover:opacity-80 transition-opacity"
+                >
+                  <Sparkles size={20} />
+                </button>
+                <button
+                  type="button"
+                  title="Connection"
+                  onClick={() => openToolTab('connect', 'Connection', <Connection />)}
+                  className="aspect-square flex items-center justify-center rounded-md bg-[#FDECC8] text-[#CB912F] hover:opacity-80 transition-opacity"
+                >
+                  <UsersRound size={20} />
+                </button>
+              </div>
             </div>
 
-            {/* mailbox links */}
-            <nav className="px-2 pb-2">
-              <button
-                type="button"
-                onClick={() => setActiveBox('new')}
-                className={`w-full text-left px-2 py-1.5 rounded-md text-sm ${activeBox === 'new' ? 'bg-gray-900 text-white' : 'hover:bg-gray-100'}`}
-              >
-                New FollowUps
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveBox('sent')}
-                className={`mt-1 w-full text-left px-2 py-1.5 rounded-md text-sm ${activeBox === 'sent' ? 'bg-gray-900 text-white' : 'hover:bg-gray-100'}`}
-              >
-                Sent FollowUps
-              </button>
-            </nav>
+            {/* Navigation */}
+            <div className="px-2 mt-2">
+              <div className="text-xs font-semibold text-gray-400 px-2 mb-1 uppercase tracking-wider">Mailbox</div>
+              <nav className="space-y-0.5">
+                <button
+                  type="button"
+                  onClick={() => setActiveBox('new')}
+                  className={`w-full text-left px-3 py-1.5 rounded-md text-sm transition-colors flex items-center gap-2 ${
+                    activeBox === 'new' 
+                      ? 'bg-[#E3E2E0] text-[#37352F] font-medium' 
+                      : 'text-gray-600 hover:bg-[#EFEFEF]'
+                  }`}
+                >
+                  <span className={`w-2 h-2 rounded-full ${activeBox === 'new' ? 'bg-blue-500' : 'bg-gray-300'}`}></span>
+                  New FollowUps
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveBox('sent')}
+                  className={`w-full text-left px-3 py-1.5 rounded-md text-sm transition-colors flex items-center gap-2 ${
+                    activeBox === 'sent' 
+                      ? 'bg-[#E3E2E0] text-[#37352F] font-medium' 
+                      : 'text-gray-600 hover:bg-[#EFEFEF]'
+                  }`}
+                >
+                  <span className={`w-2 h-2 rounded-full ${activeBox === 'sent' ? 'bg-green-500' : 'bg-gray-300'}`}></span>
+                  Sent FollowUps
+                </button>
+              </nav>
+            </div>
 
-            {/* message list for active mailbox */}
-            <div className="flex-1 overflow-auto px-2 pb-2" id="messageList">
+            {/* Message List */}
+            <div className="flex-1 overflow-auto px-2 mt-4 pb-2" id="messageList">
               {emailList
                 .filter(email => (activeBox === 'new' ? !email.isSent : email.isSent))
                 .map(email => (
                   <div
                     key={email.id}
                     onClick={() => openEmailTab(email)}
-                    className="p-2 mb-1.5 rounded-md border border-gray-200 bg-white hover:bg-gray-50 cursor-pointer"
+                    className="group p-3 mb-1 rounded-md hover:bg-[#EFEFEF] cursor-pointer border border-transparent hover:border-[#E0E0E0] transition-all"
                   >
-                    <div className="text-sm font-medium">{email.emailSubject}</div>
-                    <div className="text-xs text-gray-500 truncate">
-                      company: {email.company ?? email.emailSubject}
+                    <div className="flex items-center gap-2 mb-1">
+                       <span className="text-xs px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 font-medium">Email</span>
+                       <div className="text-xs text-gray-500 truncate">
+                        {email.company ?? "Unknown"}
+                      </div>
                     </div>
-                    <div className="text-xs text-gray-400 truncate">{email.emailText}</div>
+                    <div className="text-sm font-medium text-[#37352F] mb-0.5 truncate">{email.emailSubject}</div>
+                    <div className="text-xs text-gray-400 truncate font-normal opacity-80">{email.emailText}</div>
                   </div>
                 ))}
             </div>
           </div>
 
-          {/* Right Panel with tabs (top of pane) */}
+          {/* Right Panel — White paper look */}
           <div className="flex-1 min-w-0 h-full bg-white flex flex-col">
-            {/* per-pane tab strip */}
+            
+            {/* Tab Strip */}
             {tabs.length > 0 && (
-              <div className="flex items-center gap-1 border-b px-2 h-9 sticky top-0 bg-white overflow-x-auto">
+              <div className="flex items-end gap-1 px-2 h-10 bg-[#F7F7F5] border-b border-[#E9E9E9] overflow-x-auto no-scrollbar">
                 {tabs.map(t => (
                   <button
                     key={t.id}
@@ -322,14 +341,18 @@ export default function App() {
                       setActiveTabId(t.id);
                       setSelectedEmail(t.kind === 'email' ? t.email : null);
                     }}
-                    className={`flex items-center gap-2 px-3 h-7 rounded-t-md text-sm border whitespace-nowrap
-                      ${activeTabId === t.id ? 'bg-white border-gray-300' : 'bg-gray-100 border-transparent hover:bg-gray-200'}`}
+                    className={`
+                      group relative flex items-center gap-2 px-3 h-8 rounded-t-md text-sm border-t border-l border-r transition-all
+                      ${activeTabId === t.id 
+                        ? 'bg-white border-[#E9E9E9] border-b-white text-[#37352F] font-medium -mb-[1px] z-10' 
+                        : 'bg-[#F1F0EF] border-transparent text-gray-500 hover:bg-[#EBEAE9]'}
+                    `}
                     title={t.title}
                   >
-                    <span className="truncate max-w-[180px]">{t.title}</span>
+                    <span className="truncate max-w-[150px]">{t.title}</span>
                     <span
                       onClick={(e) => { e.stopPropagation(); closeTab(t.id); }}
-                      className="ml-1 text-gray-500 hover:text-gray-800"
+                      className={`ml-1 w-4 h-4 flex items-center justify-center rounded-sm hover:bg-black/10 ${activeTabId === t.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
                       aria-label="Close tab"
                     >
                       ×
@@ -339,57 +362,86 @@ export default function App() {
               </div>
             )}
 
-            {/* panel content */}
-            <div className="flex-1 overflow-auto p-4">
+            {/* Content Area */}
+            <div className="flex-1 overflow-auto p-8">
               {activeTabId
                 ? (() => {
                   const t = tabs.find(x => x.id === activeTabId);
-                  if (!t) return <p className="text-gray-500">No tab</p>;
-                  if (t.kind === 'tool') return t.node;
+                  if (!t) return <p className="text-gray-400 text-center mt-20">Tab not found</p>;
+                  if (t.kind === 'tool') return (
+                    <div className="max-w-3xl mx-auto animate-in fade-in duration-300">
+                      {t.node}
+                    </div>
+                  );
                   const e = t.email;
                   return (
-                    <div>
-                      <h2 className="text-xl font-bold mb-2">{e.emailSubject}</h2>
-                      <p className="whitespace-pre-wrap">{e.emailText}</p>
-                      {/* <button
-                        onClick={handleSendEmail}
-                        className="mt-4 px-4 py-2 bg-blue-500 text-black rounded"
-                      >
-                        Send Email
-                      </button> */}
-                      <button
-                        onClick={handlePaste}
-                        className="mt-4 ml-2 px-4 py-2 bg-grey-500 text-black rounded"
-                      >
-                        PASTE
-                      </button>
+                    <div className="max-w-2xl mx-auto animate-in fade-in duration-300">
+                      <div className="mb-6 pb-4 border-b border-[#E9E9E9]">
+                        <h2 className="text-2xl font-bold text-[#37352F] mb-2">{e.emailSubject}</h2>
+                        <div className="flex gap-2">
+                          <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-orange-50 text-orange-700">
+                            {e.company ?? "No Company"}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="prose prose-sm max-w-none text-[#37352F] whitespace-pre-wrap font-sans leading-relaxed">
+                        {e.emailText}
+                      </div>
+                      
+                      <div className="mt-8 flex gap-3 pt-4 border-t border-[#E9E9E9]">
+                        {/* <button
+                          onClick={handleSendEmail}
+                          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm font-medium transition-colors"
+                        >
+                          Send Email
+                        </button> */}
+                        <button
+                          onClick={handlePaste}
+                          className="px-4 py-2 bg-white border border-[#E0E0E0] text-[#37352F] rounded shadow-sm hover:bg-gray-50 text-sm font-medium transition-colors flex items-center gap-2"
+                        >
+                          <ClipboardList size={16} />
+                          Copy & Paste
+                        </button>
+                      </div>
                     </div>
                   );
                 })()
                 : (
-                  // no tabs open → original fallback
-                  <>
+                  // No tabs open view
+                  <div className="h-full flex flex-col">
                     {selectedEmail ? (
-                      <div>
-                        <h2 className="text-xl font-bold mb-2">{selectedEmail.emailSubject}</h2>
-                        <p className="whitespace-pre-wrap">{selectedEmail.emailText}</p>
-                        <button
-                          onClick={handleSendEmail}
-                          className="mt-4 px-4 py-2 bg-blue-500 text-black rounded"
-                        >
-                          Send Email
-                        </button>
-                        <button
-                          onClick={handlePaste}
-                          className="mt-4 ml-2 px-4 py-2 bg-blue-500 text-black rounded"
-                        >
-                          PASTE
-                        </button>
+                      <div className="max-w-2xl mx-auto w-full animate-in fade-in duration-300">
+                        <div className="mb-6 pb-4 border-b border-[#E9E9E9]">
+                          <h2 className="text-2xl font-bold text-[#37352F] mb-2">{selectedEmail.emailSubject}</h2>
+                          <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-orange-50 text-orange-700">
+                            {selectedEmail.company ?? "No Company"}
+                          </span>
+                        </div>
+                        <p className="whitespace-pre-wrap text-[#37352F] leading-relaxed text-sm">{selectedEmail.emailText}</p>
+                        
+                        <div className="mt-8 flex gap-3 pt-4 border-t border-[#E9E9E9]">
+                           <button
+                            onClick={handleSendEmail} // Note: this function was commented out in your original code, assuming it exists in scope or you will uncomment it
+                             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm font-medium transition-colors shadow-sm"
+                          >
+                            Send Email
+                          </button>
+                          <button
+                            onClick={handlePaste}
+                            className="px-4 py-2 bg-white border border-[#E0E0E0] text-[#37352F] rounded shadow-sm hover:bg-gray-50 text-sm font-medium transition-colors flex items-center gap-2"
+                          >
+                            <ClipboardList size={16} />
+                            Copy & Paste
+                          </button>
+                        </div>
                       </div>
                     ) : (
-                      <p className="text-gray-500">Select an email to view</p>
+                      <div className="flex flex-col items-center justify-center h-full text-gray-300 gap-4">
+                        <Sparkles size={48} strokeWidth={1} />
+                        <p className="text-sm font-medium text-gray-400">Select an email or open a tool</p>
+                      </div>
                     )}
-                  </>
+                  </div>
                 )
               }
             </div>

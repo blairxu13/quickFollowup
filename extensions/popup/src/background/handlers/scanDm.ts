@@ -4,20 +4,35 @@ export function scanUntilFirstDMable(links: string[]) {
     if (!Array.isArray(links) || links.length === 0) return;
     let found = false;
 
-    function sendPrefillConnect(tabId: any, connectBody: any) {
+    function sendPrefillConnect(tabId: any, connectBody: any, connectSubject: any) {
         chrome.scripting.executeScript({
             target: { tabId },
             world: "MAIN",
-            func: ((body: string) => {
+            func: ((body: string, subject: string) => {
+                console.log("[LinkedIn Helper] Script injected. Waiting for elements...");
                 const observer = new MutationObserver(() => {
-                    const connectBox = document.querySelector(
-                        'div.msg-form__contenteditable[contenteditable="true"][role="textbox"]'
-                      ) as HTMLElement | null;
+                    // 1. Handle Subject Line (if present)
+                    const subjectBox = document.querySelector('input[name="subject"]') as HTMLInputElement | null;
+                    if (subjectBox && subject && !subjectBox.value) {
+                        console.log("[LinkedIn Helper] Found subject box, filling...");
+                        subjectBox.focus();
+                        document.execCommand("insertText", false, subject);
+                        subjectBox.dispatchEvent(new InputEvent("input", { bubbles: true }));
+                        subjectBox.dispatchEvent(new Event("change", { bubbles: true }));
+                    }
+
+                    // 2. Handle Message Body
+                    // Prioritizing class-based selector from screenshot: div.msg-form__contenteditable
+                    const connectBox = (
+                        document.querySelector('div.msg-form__contenteditable') ||
+                        document.querySelector('div[role="textbox"][aria-label="Write a message..."]') ||
+                        document.querySelector('div[role="textbox"][aria-label*="Write a message"]') ||
+                        document.querySelector('div[role="textbox"][aria-label*="Message"]')
+                    ) as HTMLElement | null;
                       
                     if (!connectBox) return;
 
-                    // connectBox.textContent = body;
-                    // connectBox.dispatchEvent(new Event("input", { bubbles: true }));
+                    console.log("[LinkedIn Helper] Found message body box, filling...");
                     connectBox.focus();
                     connectBox.innerHTML = "";  // ensure clean slate
                     document.execCommand("insertText", false, body);
@@ -31,7 +46,7 @@ export function scanUntilFirstDMable(links: string[]) {
                 observer.observe(document.body, { childList: true, subtree: true });
                 setTimeout(() => observer.disconnect(), 10000);
             }) as any,
-            args: [connectBody],
+            args: [connectBody || "", connectSubject || ""],
         });
 
     }
@@ -53,7 +68,7 @@ export function scanUntilFirstDMable(links: string[]) {
                     chrome.runtime.onMessage.removeListener(handler);
 
                     chrome.storage.local.get(["shouldRunExtractor", "draftSubject", "draftBody"], (res) => {
-                        sendPrefillConnect(tabId, res.draftBody);
+                        sendPrefillConnect(tabId, res.draftBody || "", res.draftSubject || "");
                     });
                 } else if (msg.action === ACTION.RECRUITER.RECRUITER_NOT_DMABLE && !found) {
                    
